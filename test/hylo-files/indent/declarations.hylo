@@ -692,9 +692,9 @@ distributed
 }
 
 
-// Protocol declarations
+// Trait declarations
 
-protocol Foo {
+trait Foo {
     fun foo(x: Int, y: Int) throws -> (A, B)
     fun bar(x: Int) throws
     fun baz(x: () throws -> Int) rethrows

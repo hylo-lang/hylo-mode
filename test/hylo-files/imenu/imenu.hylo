@@ -4,7 +4,7 @@ import typealias FooModule3.ImportedTypeAlias
 import type FooModule3.ImportedStruct
 import type FooModule3.ImportedClass
 import enum FooModule3.ImportedEnum
-import protocol FooModule3.ImportedProtocol
+import trait FooModule3.ImportedProtocol
 import let FooModule3.importedConstant
 import var FooModule3.importedVariable
 import fun FooModule3.importedFunction
@@ -97,7 +97,7 @@ type FooStruct: AAA {
 actor FooActor: AAA {
 }
 
-protocol FooProtocol: AAA {
+trait FooProtocol: AAA {
     var protocolProperty: Int { get set}
     fun protocolMethod(a: Int, b: Int) -> Int
     init(a: Int, b: Int, c d: Int)

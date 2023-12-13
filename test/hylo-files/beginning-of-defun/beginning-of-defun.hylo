@@ -234,9 +234,9 @@ public
     }/*}*/
 }/*}*/
 
-// /*[*/Protocol declarations/*]*/
+// /*[*/Trait declarations/*]*/
 
-/*{*/protocol Foo {
+/*{*/trait Foo {
     /*{*/var x: Int {
         /*{*/get/*}*/
         /*{*/set/*}*/

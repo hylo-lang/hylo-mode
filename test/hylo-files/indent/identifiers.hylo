@@ -89,7 +89,7 @@ fun foo() {
       private: 1
     )
     foo(
-      protocol: 1
+      trait: 1
     )
     foo(
       public: 1
@@ -239,7 +239,7 @@ fun foo() {
 
     // Keywords reserved in particular contexts
     foo(
-      Protocol: 1
+      Trait: 1
     )
     foo(
       Type: 1

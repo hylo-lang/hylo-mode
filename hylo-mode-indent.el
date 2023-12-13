@@ -1049,7 +1049,7 @@ OFFSET is the offset of the contents."
             (goto-char (1+ pos)))
 
            ((and
-             (equal (hylo-mode:token:text next-token) "protocol")
+             (equal (hylo-mode:token:text next-token) "trait")
              (not (equal (hylo-mode:token:text
                           (save-excursion (hylo-mode:forward-token)))
                          "<")))
@@ -1629,7 +1629,7 @@ It is a Generic parameter list if:
   ;; Example of complex generic parameters:
   ;; <
   ;;   A: B,
-  ;;   C: protocol<X, Y>
+  ;;   C: trait<X, Y>
   ;;   where
   ;;     A: @aaa(1 + 2 + 3) D<Int>!,
   ;;     C == (@aaa(1) inout [E.F]?, G...) throws -> [Int:Int]

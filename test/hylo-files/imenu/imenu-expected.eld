@@ -7,7 +7,7 @@
             ((class (identifier "NestedClass1" 2515 2527)
                     ((class (identifier "NestedClass2" 2544 2556)
                             ((class (identifier "NestedClass3" 2577 2589) nil)))))))
- (protocol (identifier "FooProtocol" 2215 2226)
+ (trait (identifier "FooProtocol" 2215 2226)
            ((var (identifier "protocolProperty" 2242 2258) nil)
             (fun (identifier "protocolMethod(a:b:)" 2284 2298) nil)
             (init (identifier "init(a:b:c:)" 2326 2330) nil)

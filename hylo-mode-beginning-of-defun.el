@@ -168,7 +168,7 @@ The cursor must be at the beginning of a statement."
   (let ((token (hylo-mode:forward-token-or-list))
         (defun-keywords
          '("import" "typealias" "type"
-           "enum" "type" "actor" "protocol" "extension"
+           "enum" "type" "actor" "trait" "extension"
            "fun" "init" "deinit" "subscript" "macro"
            "get" "set" "willSet" "didSet"
            "prefix" "postfix" "infix" "precedencegroup"
@@ -208,7 +208,7 @@ Return nil otherwise."
      (hylo-mode:beginning-of-statement)
      (member
       (hylo-mode:token:text (hylo-mode:find-defun-keyword-simple))
-      '("enum" "type" "actor" "protocol" "extension")))))
+      '("enum" "type" "actor" "trait" "extension")))))
 
 (defun hylo-mode:beginning-of-statement ()
   "Move backward to the beginning of a statement.
@@ -1443,7 +1443,7 @@ of ancestors."
        (cond
         ((member keyword-text
                  '("typealias" "type" "precedencegroup" "fun" "macro"
-                   "enum" "type" "actor" "protocol" "extension"))
+                   "enum" "type" "actor" "trait" "extension"))
          (hylo-mode:forward-token))
 
         ((member keyword-text '("init" "deinit" "subscript"))

@@ -288,13 +288,13 @@ let foo: A!
 let foo:
   A! = abc
 
-// Protocol composition types
+// Trait composition types
 
-let foo: protocol<A<[B]>,
+let foo: trait<A<[B]>,
                   C<(D, E)>>
   = a
 
-let foo: protocol<
+let foo: trait<
   A, // hylo-mode:test:known-bug
   B
 >

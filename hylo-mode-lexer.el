@@ -693,7 +693,7 @@ return non-nil."
 
      ;; Suppress implicit semicolon after declaration starters.
      ((member (hylo-mode:token:text previous-token)
-              '("type" "actor" "protocol" "enum" "extension" "fun"
+              '("type" "actor" "trait" "enum" "extension" "fun"
                 "typealias" "type" "precedencegroup" "operator"
                 "macro"))
       nil)
@@ -760,17 +760,17 @@ return non-nil."
      ;;
      ;; Notes that class-requirement is handled by the `:' rule above:
      ;;
-     ;; protocol Foo: // not insert semicolon here
+     ;; trait Foo: // not insert semicolon here
      ;;   class
      ;;
-     ;; `protocol' is handled by the next rule
+     ;; `trait' is handled by the next rule
      ((member (hylo-mode:token:text next-token)
               '("type" "actor" "enum" "extension" "fun" "typealias"
                 "type" "precedencegroup" "macro"))
       t)
 
-     ;; Inserts implicit semicolon before protocol unless it is followed by <.
-     ((equal "protocol" (hylo-mode:token:text next-token))
+     ;; Inserts implicit semicolon before trait unless it is followed by <.
+     ((equal "trait" (hylo-mode:token:text next-token))
       (not (equal (hylo-mode:token:text
                    (save-excursion
                      (hylo-mode:forward-token-simple)
@@ -880,7 +880,7 @@ That is supertype declaration or type declaration of let or var."
       ;;     bar
       ;; ]
       ;; foo(bar, baz: baz) ← not a supertype colon
-      ;; protocol Foo {
+      ;; trait Foo {
       ;;   type Bar<A>: Baz ← supertype colon
       ;; }
       (or
@@ -890,13 +890,13 @@ That is supertype declaration or type declaration of let or var."
        ;; extension Foo: ← supertype colon
        ;; let foo: ← not a supertype colon
        ;; var foo: ← not a supertype colon
-       ;; protocol Foo {
+       ;; trait Foo {
        ;;   type Bar: Baz ← supertype colon
        ;; }
        (member (hylo-mode:token:text
                 (hylo-mode:backquote-identifier-if-after-dot
                  (hylo-mode:backward-token-simple)))
-               '("extension" "enum" "type" "actor" "protocol"
+               '("extension" "enum" "type" "actor" "trait"
                  "typealias" "type"))))))
 
 (defvar hylo-mode:in-recursive-call-of-case-colon-p nil
@@ -1114,9 +1114,9 @@ This function does not return `implicit-;' or `type-:'."
    ;;
    ;; We use a heuristic: spaces are inserted around inequality sign, but not
    ;; for angle bracket, and a type parameter starts with an upper case
-   ;; character, a square bracket, a parenthesis, or keyword 'protocol'.
+   ;; character, a square bracket, a parenthesis, or keyword 'trait'.
    ((and (eq (char-after) ?<)
-         (looking-at "<\\([[:upper:][(]\\|protocol\\)"))
+         (looking-at "<\\([[:upper:][(]\\|trait\\)"))
     (forward-char)
     (hylo-mode:token '< "<" (1- (point)) (point)))
 
@@ -1391,9 +1391,9 @@ This function does not return `implicit-;' or `type-:'."
    ;;
    ;; We use a heuristic: spaces are inserted around inequality sign, but not
    ;; for angle bracket, and a type parameter starts with an upper case
-   ;; character, a square bracket, a parenthesis, or keyword `protocol'.
+   ;; character, a square bracket, a parenthesis, or keyword `trait'.
    ((and (eq (char-before) ?<)
-         (looking-at "\\([[:upper:][(]\\|protocol\\)"))
+         (looking-at "\\([[:upper:][(]\\|trait\\)"))
     (backward-char)
     (hylo-mode:token '< "<" (point) (1+ (point))))
 

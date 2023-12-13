@@ -198,7 +198,7 @@ This function does not search beyond LIMIT."
     (concat
      "\\<\\("
      (string-join
-      '("fun" "enum" "type" "protocol" "extension" "actor" "macro")
+      '("fun" "enum" "type" "trait" "extension" "actor" "macro")
       "\\|")
      "\\)\\>"))))
 
@@ -360,7 +360,7 @@ The predicate MATCH-P is called with two arguments:
 (defun hylo-mode:font-lock-match-declared-function-names (limit)
   "Move the cursor just after a function name or others.
 
-Others includes enum, type, protocol, and extension name.
+Others includes enum, type, trait, and extension name.
 Set `match-data', and return t if a function name or others found before
 position LIMIT.
 Return nil otherwise."
@@ -522,7 +522,7 @@ Return nil otherwise."
 (defconst hylo-mode:declaration-keywords
   '("type" "deinit" "enum" "extension" "fileprivate" "fun"
     "import" "init" "inout" "internal" "let" "open" "operator" "package"
-    "private" "protocol" "public" "any" "some" "static" "type" "subscript"
+    "private" "trait" "public" "any" "some" "static" "type" "subscript"
     "typealias" "var" "actor" "nonisolated" "isolated" "distributed"
     "borrowing" "consuming" "macro")
   "Keywords used in declarations.")
@@ -540,7 +540,7 @@ Return nil otherwise."
 Excludes true, false, and keywords begin with a number sign.")
 
 (defconst hylo-mode:context-keywords
-  '("Protocol" "Type" "and" "assignment" "associativity" "convenience" "didSet"
+  '("Trait" "Type" "and" "assignment" "associativity" "convenience" "didSet"
     "dynamic" "final" "get" "higherThan" "indirect" "infix" "lazy" "left"
     "lowerThan" "mutating" "none" "nonmutating" "optional" "override" "postfix"
     "precedence" "precedencegroup" "prefix" "required" "right" "set" "unowned"

@@ -163,7 +163,7 @@ Return found declarations in reverse order."
          ;; Ignores the token otherwise.
          ))
 
-       ((member next-text '("type" "protocol" "extension" "enum" "actor"))
+       ((member next-text '("type" "trait" "extension" "enum" "actor"))
         (setq last-class-token nil)
         (let ((declaration
                (hylo-mode:scan-declarations:handle-type-like next-token)))
