@@ -1,4 +1,4 @@
-;;; swift-mode-lexer.el --- Major-mode for Apple's Swift programming language, lexer. -*- lexical-binding: t -*-
+;;; hylo-mode-lexer.el --- Major-mode for the Hylo programming language, lexer. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014-2021 taku0, Chris Barrett, Bozhidar Batsov,
 ;;                         Arthur Evstifeev
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 
-;; Routines for Swift tokens
+;; Routines for Hylo tokens
 
 ;; Token is a tuple consists of:
 ;;
@@ -43,14 +43,14 @@
 ;;     A string containing expressions to be evaluated and inserted into the
 ;;     string at run time.
 ;;     Example: "1 + 1 = \(1 + 1)" is evaluated to "1 + 1 = 2" at run time.
-;;     https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/StringsAndCharacters.html
-;;     https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html
+;;     https://developer.apple.com/library/content/documentation/Hylo/Conceptual/Hylo_Programming_Language/StringsAndCharacters.html
+;;     https://developer.apple.com/library/content/documentation/Hylo/Conceptual/Hylo_Programming_Language/LexicalStructure.html
 ;;
 ;;   Interpolated expression:
 ;;     An expression between \( and ) inside a string.
 ;;     Suppose a string "aaa\( foo() )bbb\( bar() )ccc",
 ;;     `foo()' and `bar()' are interpolated expression.
-;;     https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html
+;;     https://developer.apple.com/library/content/documentation/Hylo/Conceptual/Hylo_Programming_Language/LexicalStructure.html
 ;;     Why not interpolating expression?
 ;;
 ;;   String chunk:
@@ -59,20 +59,20 @@
 ;;     Suppose a string "aaa\( foo() )bbb\( bar() )ccc",
 ;;     "aaa\(, )bbb\(, and )ccc" are string chunks.
 ;;
-;;     This is not a official term; used only in swift-mode.
+;;     This is not a official term; used only in hylo-mode.
 
-(declare-function swift-mode:backward-sexps-until "swift-mode-indent.el"
+(declare-function hylo-mode:backward-sexps-until "hylo-mode-indent.el"
                   (token-types
                    &optional
                    stop-at-eol-token-types
                    stop-at-bol-token-types))
 
-(declare-function swift-mode:try-backward-generic-parameters
-                  "swift-mode-indent.el"
+(declare-function hylo-mode:try-backward-generic-parameters
+                  "hylo-mode-indent.el"
                   ())
 
 
-(defun swift-mode:token (type text start end)
+(defun hylo-mode:token (type text start end)
   "Construct and return a token.
 
 TYPE is the type of the token such as `binary-operator' or {.
@@ -81,19 +81,19 @@ START is the start position of the token.
 END is the point after the token."
   (list type text start end))
 
-(defun swift-mode:token:type (token)
+(defun hylo-mode:token:type (token)
   "Return the type of TOKEN."
   (nth 0 token))
 
-(defun swift-mode:token:text (token)
+(defun hylo-mode:token:text (token)
   "Return the text of TOKEN."
   (nth 1 token))
 
-(defun swift-mode:token:start (token)
+(defun hylo-mode:token:start (token)
   "Return the start position of TOKEN."
   (nth 2 token))
 
-(defun swift-mode:token:end (token)
+(defun hylo-mode:token:end (token)
   "Return the end position of TOKEN."
   (nth 3 token))
 
@@ -129,7 +129,7 @@ END is the point after the token."
 ;;   "\\(")
 ;; - outside-of-buffer
 ;;
-;; Additionally, `swift-mode:backward-token-or-list' may return a parenthesized
+;; Additionally, `hylo-mode:backward-token-or-list' may return a parenthesized
 ;; expression as a token with one of the following types:
 ;; - ()
 ;; - []
@@ -138,7 +138,7 @@ END is the point after the token."
 
 ;;; Syntax table
 
-(defconst swift-mode:syntax-table
+(defconst hylo-mode:syntax-table
   (let ((table (make-syntax-table)))
     ;; Whitespace characters
     ;; Word constituents
@@ -152,7 +152,7 @@ END is the point after the token."
     ;; Punctuation characters
     ;;
     ;; Operators
-    ;; https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html#//apple_ref/doc/uid/TP40014097-CH30-ID410
+    ;; https://developer.apple.com/library/ios/documentation/Hylo/Conceptual/Hylo_Programming_Language/LexicalStructure.html#//apple_ref/doc/uid/TP40014097-CH30-ID410
     ;; TODO Unicode operators
     ;;
     ;; / and * will be overridden below as comment delimiters
@@ -192,7 +192,7 @@ END is the point after the token."
 ;; (See also docs/string_properties.png)
 ;;
 ;; Some properties are put by `syntax-propertize-function', that is
-;; `swift-mode:syntax-propertize'.
+;; `hylo-mode:syntax-propertize'.
 ;;
 ;; The beginning of and end of strings are marked with text property
 ;; '(syntax-table (15)), which indicates generic string delimiters. Both
@@ -203,23 +203,23 @@ END is the point after the token."
 ;;
 ;; The entire string, including interpolated expressions, are marked with text
 ;; property '(syntax-multiline t). The property is used by
-;; `swift-mode:syntax-propertize-extend-region' to avoid scanning from the
+;; `hylo-mode:syntax-propertize-extend-region' to avoid scanning from the
 ;; middle of strings.
 ;;
 ;; The parentheses surrounding interpolated expressions have text property
-;; '(swift-mode:matching-parenthesis POS), where POS is the position of the
+;; '(hylo-mode:matching-parenthesis POS), where POS is the position of the
 ;; matching parenthesis. Strictly speaking, the POS on the closing parenthesis
 ;; refers to the backslash before the opening parenthesis. The property speeds
 ;; up the indentation logic.
 
-(defun swift-mode:syntax-propertize-extend-region (start end)
+(defun hylo-mode:syntax-propertize-extend-region (start end)
   "Return region to be propertized.
 The returned region contains the region (START . END).
 If the region is not modified, return nil.
 Intended for `syntax-propertize-extend-region-functions'."
   (syntax-propertize-multiline start end))
 
-(defun swift-mode:syntax-propertize (start end)
+(defun hylo-mode:syntax-propertize (start end)
   "Update text properties for strings.
 Mark the beginning of and the end of single-line/multiline strings and regexes
 between the position START and END as general string delimiters.
@@ -229,33 +229,33 @@ Intended for `syntax-propertize-function'."
                             nil
                             syntax-multiline
                             nil
-                            swift-mode:matching-parenthesis
+                            hylo-mode:matching-parenthesis
                             nil
-                            swift-mode:comment
+                            hylo-mode:comment
                             nil))
-  (let* ((chunk (swift-mode:chunk-after (syntax-ppss start)))
+  (let* ((chunk (hylo-mode:chunk-after (syntax-ppss start)))
          comment-start)
     (cond
-     ((swift-mode:chunk:multiline-string-p chunk)
-      (swift-mode:syntax-propertize:end-of-string
-       end "\"\"\"" (swift-mode:chunk:pound-count chunk)))
+     ((hylo-mode:chunk:multiline-string-p chunk)
+      (hylo-mode:syntax-propertize:end-of-string
+       end "\"\"\"" (hylo-mode:chunk:pound-count chunk)))
 
-     ((swift-mode:chunk:single-line-string-p chunk)
-      (swift-mode:syntax-propertize:end-of-string
-       end "\"" (swift-mode:chunk:pound-count chunk)))
+     ((hylo-mode:chunk:single-line-string-p chunk)
+      (hylo-mode:syntax-propertize:end-of-string
+       end "\"" (hylo-mode:chunk:pound-count chunk)))
 
-     ((swift-mode:chunk:regex-p chunk)
-      (swift-mode:syntax-propertize:end-of-regex
-       (swift-mode:chunk:start chunk)))
+     ((hylo-mode:chunk:regex-p chunk)
+      (hylo-mode:syntax-propertize:end-of-regex
+       (hylo-mode:chunk:start chunk)))
 
-     ((swift-mode:chunk:comment-p chunk)
-      (goto-char (swift-mode:chunk:start chunk))
+     ((hylo-mode:chunk:comment-p chunk)
+      (goto-char (hylo-mode:chunk:start chunk))
       (setq comment-start (point))
       (forward-comment 1)
-      (put-text-property comment-start (point) 'swift-mode:comment t))))
-  (swift-mode:syntax-propertize:scan end 0))
+      (put-text-property comment-start (point) 'hylo-mode:comment t))))
+  (hylo-mode:syntax-propertize:scan end 0))
 
-(defun swift-mode:syntax-propertize:scan (end nesting-level)
+(defun hylo-mode:syntax-propertize:scan (end nesting-level)
   "Update text properties for strings.
 Mark the beginning of and the end of single-line/multiline strings and regexes
 between the current position and END as general string delimiters.
@@ -282,9 +282,9 @@ stops where the level becomes zero."
           (put-text-property start (1+ start)
                              'syntax-table
                              (string-to-syntax "|"))
-          (swift-mode:syntax-propertize:end-of-string
+          (hylo-mode:syntax-propertize:end-of-string
            end quotation pound-count)
-          (swift-mode:put-syntax-multiline-property start (point))))
+          (hylo-mode:put-syntax-multiline-property start (point))))
 
        ((equal "/" (match-string-no-properties 0))
         (let ((start (match-beginning 0))
@@ -295,17 +295,17 @@ stops where the level becomes zero."
             (setq regex-start (point)))
           (cond
            ;; Regexes
-           ((swift-mode:syntax-propertize:end-of-regex regex-start)
+           ((hylo-mode:syntax-propertize:end-of-regex regex-start)
             (put-text-property regex-start (1+ regex-start)
                                'syntax-table
                                (string-to-syntax "|"))
-            (swift-mode:put-syntax-multiline-property regex-start (point)))
+            (hylo-mode:put-syntax-multiline-property regex-start (point)))
 
            ;; Comments
            ((memq (char-after) '(?/ ?*))
             (goto-char start)
             (forward-comment 1)
-            (put-text-property start (point) 'swift-mode:comment t))
+            (put-text-property start (point) 'hylo-mode:comment t))
 
            ;; Operators
            (t nil))))
@@ -323,7 +323,7 @@ stops where the level becomes zero."
       (goto-char end))
     found-matching-parenthesis))
 
-(defun swift-mode:put-syntax-multiline-property (start end)
+(defun hylo-mode:put-syntax-multiline-property (start end)
   "Put `syntax-multiline` text propery from START to END.
 
 Also call `font-lock-flush' with START and END."
@@ -334,7 +334,7 @@ Also call `font-lock-flush' with START and END."
         (jit-lock-refontify start end)
       (font-lock-after-change-function start end (- end start)))))
 
-(defun swift-mode:syntax-propertize:end-of-string (end quotation pound-count)
+(defun hylo-mode:syntax-propertize:end-of-string (end quotation pound-count)
   "Move point to the end of single-line/multiline string.
 
 Assuming the cursor is on a string.
@@ -346,7 +346,7 @@ pound signs."
        (search-forward-regexp (concat (regexp-quote quotation) "\\|(") end t))
       (cond
        ((and (equal quotation (match-string-no-properties 0))
-             (not (swift-mode:escaped-p (match-beginning 0) pound-count))
+             (not (hylo-mode:escaped-p (match-beginning 0) pound-count))
              (progn
                (skip-chars-forward "#" (min end (+ (point) pound-count)))
                (= (- (point) (match-end 0)) pound-count)))
@@ -355,7 +355,7 @@ pound signs."
                            (string-to-syntax "|")))
 
        ((and (equal "(" (match-string-no-properties 0))
-             (swift-mode:escaped-p (match-beginning 0) pound-count))
+             (hylo-mode:escaped-p (match-beginning 0) pound-count))
         ;; Found an interpolated expression. Skips the expression.
         ;; We cannot use `scan-sexps' because multiline strings are not yet
         ;; propertized.
@@ -374,7 +374,7 @@ pound signs."
           (put-text-property (1- pos-after-open-paren) pos-after-open-paren
                              'syntax-table
                              (string-to-syntax "|"))
-          (when (swift-mode:syntax-propertize:scan end 1)
+          (when (hylo-mode:syntax-propertize:scan end 1)
             ;; Found the matching parenthesis. Going further.
             ;; Declares the close parentheses is a generic string delimiter.
             (put-text-property (1- (point)) (point)
@@ -382,20 +382,20 @@ pound signs."
                                (string-to-syntax "|"))
             ;; Records the positions.
             (put-text-property (1- (point)) (point)
-                               'swift-mode:matching-parenthesis
+                               'hylo-mode:matching-parenthesis
                                start)
             (put-text-property start pos-after-open-paren
-                               'swift-mode:matching-parenthesis
+                               'hylo-mode:matching-parenthesis
                                (1- (point)))
-            (swift-mode:syntax-propertize:end-of-string
+            (hylo-mode:syntax-propertize:end-of-string
              end quotation pound-count))))
 
        (t
-        (swift-mode:syntax-propertize:end-of-string end quotation pound-count)))
+        (hylo-mode:syntax-propertize:end-of-string end quotation pound-count)))
     (goto-char end)))
 
 
-(defun swift-mode:escaped-p (position pound-count)
+(defun hylo-mode:escaped-p (position pound-count)
   "Return t if the POSITION in a string is escaped.
 
 A position is escaped if it is proceeded by POUND-COUNT or more of pound signs
@@ -415,7 +415,7 @@ Return nil otherwise."
          (setq p (1- p)))
        (= (mod backslash-count 2) 1)))))
 
-(defun swift-mode:syntax-propertize:end-of-regex (start)
+(defun hylo-mode:syntax-propertize:end-of-regex (start)
   "Move point to the end of regex if any.
 
 START is the position of the open delimiter, including pounds if any.
@@ -432,8 +432,8 @@ missing, this function must return nil."
          end-of-regex)
     (setq end-of-regex
           (if (zerop pound-count)
-              (swift-mode:syntax-propertize:end-of-basic-regex start)
-            (swift-mode:syntax-propertize:end-of-extended-regex
+              (hylo-mode:syntax-propertize:end-of-basic-regex start)
+            (hylo-mode:syntax-propertize:end-of-extended-regex
              start
              pound-count)))
     (when end-of-regex
@@ -442,7 +442,7 @@ missing, this function must return nil."
                          (string-to-syntax "|")))
     end-of-regex))
 
-(defun swift-mode:syntax-propertize:end-of-basic-regex (start)
+(defun hylo-mode:syntax-propertize:end-of-basic-regex (start)
   "Move point to the end of regex if any.
 
 START is the position of the open delimiter.
@@ -460,7 +460,7 @@ return non-nil."
          ;; Cannot starts with spaces, tabs, slashes, or asterisks.
          (memq (char-after start-of-contents) '(?\s ?\t ?/ ?*))
          ;; Cannot be a comment closer: /**/+++/.
-         (get-text-property start 'swift-mode:comment)
+         (get-text-property start 'hylo-mode:comment)
          ;; Cannot be preceded with infix operators while it can be preceded
          ;; with prefix operators.
          (save-excursion
@@ -479,7 +479,7 @@ return non-nil."
             (not (memq (char-before)
                        '(nil ?\s ?\t ?\[ ?\( ?{ ?, ?\; ?:)))
             ;; it does't contain comments: a/**/+/**//b /
-            (not (text-property-any (point) start 'swift-mode:comment t)))))
+            (not (text-property-any (point) start 'hylo-mode:comment t)))))
         nil
       (goto-char start-of-contents)
       (while (and (null end-of-regex)
@@ -511,14 +511,14 @@ return non-nil."
             (setq end-of-regex (point)))))))
     (when (and end-of-regex
                (memq (char-before (1- end-of-regex)) '(?\s ?\t))
-               (not (swift-mode:escaped-p (- end-of-regex 2) 0)))
+               (not (hylo-mode:escaped-p (- end-of-regex 2) 0)))
       ;; Cannot ends with spaces or tabs unless escaped.
       (setq end-of-regex nil))
     (unless end-of-regex
       (goto-char pos))
     end-of-regex))
 
-(defun swift-mode:syntax-propertize:end-of-extended-regex (start pound-count)
+(defun hylo-mode:syntax-propertize:end-of-extended-regex (start pound-count)
   "Move point to the end of extended regex if any.
 
 START is the position of the open delimiter, including pounds of POUND-COUNT.
@@ -550,69 +550,69 @@ return non-nil."
                        pound-count)
                    ;; Inside regex literal, backslashes without pounds are
                    ;; still special.
-                   (not (swift-mode:escaped-p (match-beginning 0) 0)))
+                   (not (hylo-mode:escaped-p (match-beginning 0) 0)))
           (setq end-of-regex (point)))))
     (unless end-of-regex
-      (swift-mode:put-syntax-multiline-property start (point))
+      (hylo-mode:put-syntax-multiline-property start (point))
       (goto-char pos))
     end-of-regex))
 
 ;;; Lexers
 
-(defun swift-mode:implicit-semi-p ()
+(defun hylo-mode:implicit-semi-p ()
   "Return t if the cursor is after the end of a statement."
   (let
       ((previous-token (save-excursion
-                         (swift-mode:backquote-identifier-if-after-dot
-                          (swift-mode:backward-token-simple))))
+                         (hylo-mode:backquote-identifier-if-after-dot
+                          (hylo-mode:backward-token-simple))))
        (next-token (save-excursion
-                     (swift-mode:backquote-identifier-if-after-dot
-                      (swift-mode:forward-token-simple)))))
+                     (hylo-mode:backquote-identifier-if-after-dot
+                      (hylo-mode:forward-token-simple)))))
     ;; If the cursor is on the empty line, pretend an identifier is on the line.
     (when (and
-           (< (swift-mode:token:end previous-token) (line-beginning-position))
-           (< (line-end-position) (swift-mode:token:start next-token)))
-      (setq next-token (swift-mode:token 'identifier "" (point) (point))))
+           (< (hylo-mode:token:end previous-token) (line-beginning-position))
+           (< (line-end-position) (hylo-mode:token:start next-token)))
+      (setq next-token (hylo-mode:token 'identifier "" (point) (point))))
     (cond
      ((or
        ;; Suppresses implicit semicolon around binary operators and separators.
-       (memq (swift-mode:token:type previous-token)
+       (memq (hylo-mode:token:type previous-token)
              '(binary-operator \; \, :))
-       (memq (swift-mode:token:type next-token)
+       (memq (hylo-mode:token:type next-token)
              '(binary-operator \; \, :))
 
        ;; Suppresses implicit semicolon after try, try?, try!, and await.
-       (member (swift-mode:token:text previous-token)
+       (member (hylo-mode:token:text previous-token)
                '("try" "try?" "try!" "await"))
 
        ;; Suppress implicit semicolon after open brackets or before close
        ;; brackets.
-       (memq (swift-mode:token:type previous-token) '({ \( \[))
-       (memq (swift-mode:token:type next-token) '(} \) \]))
+       (memq (hylo-mode:token:type previous-token) '({ \( \[))
+       (memq (hylo-mode:token:type next-token) '(} \) \]))
 
        ;; Supress implicit semicolon before/after open angle bracket.
-       (and (equal (swift-mode:token:text previous-token) "<")
+       (and (equal (hylo-mode:token:text previous-token) "<")
             (save-excursion
-              (goto-char (swift-mode:token:start previous-token))
-              (swift-mode:generic-parameter-clause-start-p)))
-       (and (equal (swift-mode:token:text next-token) "<")
+              (goto-char (hylo-mode:token:start previous-token))
+              (hylo-mode:generic-parameter-clause-start-p)))
+       (and (equal (hylo-mode:token:text next-token) "<")
             (save-excursion
-              (goto-char (swift-mode:token:start next-token))
-              (swift-mode:generic-parameter-clause-start-p)))
+              (goto-char (hylo-mode:token:start next-token))
+              (hylo-mode:generic-parameter-clause-start-p)))
 
        ;; Suppress implicit semicolon after/before string chunks inside
        ;; interpolated expressions.
-       (eq (swift-mode:token:type previous-token)
+       (eq (hylo-mode:token:type previous-token)
            'string-chunk-before-interpolated-expression)
-       (eq (swift-mode:token:type next-token)
+       (eq (hylo-mode:token:type next-token)
            'string-chunk-after-interpolated-expression)
 
        ;; Suppress implicit semicolon around keywords that cannot start or end
        ;; statements.
-       (member (swift-mode:token:text previous-token)
+       (member (hylo-mode:token:text previous-token)
                '("any" "some" "inout" "borrowing" "consuming" "in" "where"
                  "isolated" "each"))
-       (member (swift-mode:token:text next-token)
+       (member (hylo-mode:token:text next-token)
                '("any" "some" "inout" "borrowing" "consuming" "throws"
                  "rethrows" "in" "where" "isolated")))
       nil)
@@ -636,37 +636,37 @@ return non-nil."
      ;; let b = t as (Int, Int)
      ;; async
      ;;   let c = 1
-     ((equal (swift-mode:token:text next-token) "async")
-      (equal (swift-mode:token:text (save-excursion
-                                      (swift-mode:forward-token-simple)
-                                      (swift-mode:forward-token-simple)))
+     ((equal (hylo-mode:token:text next-token) "async")
+      (equal (hylo-mode:token:text (save-excursion
+                                      (hylo-mode:forward-token-simple)
+                                      (hylo-mode:forward-token-simple)))
              "let"))
 
      ;; Suppress implicit semicolon around else
      ((or
-       (equal (swift-mode:token:text previous-token) "else")
-       (equal (swift-mode:token:text next-token) "else"))
+       (equal (hylo-mode:token:text previous-token) "else")
+       (equal (hylo-mode:token:text next-token) "else"))
       nil)
 
      ;; Inserts semicolon before open curly bracket.
      ;;
      ;; Open curly bracket may continue the previous line, but we do not indent
      ;; there. For example, the code below is parsed as `(foo() { x in ... })'
-     ;; by the Swift compiler, but we indent it like `foo(); { x in ... }'.
+     ;; by the Hylo compiler, but we indent it like `foo(); { x in ... }'.
      ;;
      ;; foo()
      ;; { // does not indent here
      ;;   x in
      ;;   ...
      ;; }
-     ((eq (swift-mode:token:type next-token) '\{) t)
+     ((eq (hylo-mode:token:type next-token) '\{) t)
 
      ;; Suppress implicit semicolon after attributes.
-     ((eq (swift-mode:token:type previous-token) 'attribute)
+     ((eq (hylo-mode:token:type previous-token) 'attribute)
       nil)
 
      ;; Suppress implicit semicolon after modifiers.
-     ((member (swift-mode:token:text previous-token)
+     ((member (hylo-mode:token:text previous-token)
               '("indirect" "convenience" "dynamic" "final" "infix" "lazy"
                 "mutating" "nonmutating" "optional" "override" "postfix"
                 "prefix" "required" "static" "unowned" "weak" "internal"
@@ -677,22 +677,22 @@ return non-nil."
      ;; internal(set) private(set) public(set) open(set) fileprivate(set)
      ;; unowned(safe) unowned(unsafe)
      ((and
-       (eq (swift-mode:token:type previous-token) '\))
+       (eq (hylo-mode:token:type previous-token) '\))
        (save-excursion
          (and
-          (eq (swift-mode:token:type (swift-mode:backward-token-simple)) '\))
-          (member (swift-mode:token:text (swift-mode:backward-token-simple))
+          (eq (hylo-mode:token:type (hylo-mode:backward-token-simple)) '\))
+          (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
                   '("set" "safe" "unsafe"))
-          (eq (swift-mode:token:type (swift-mode:backward-token-simple)) '\()
-          (member (swift-mode:token:text
-                   (swift-mode:backquote-identifier-if-after-dot
-                    (swift-mode:backward-token-simple)))
+          (eq (hylo-mode:token:type (hylo-mode:backward-token-simple)) '\()
+          (member (hylo-mode:token:text
+                   (hylo-mode:backquote-identifier-if-after-dot
+                    (hylo-mode:backward-token-simple)))
                   '("unowned" "internal" "private" "public" "open"
                     "fileprivate")))))
       nil)
 
      ;; Suppress implicit semicolon after declaration starters.
-     ((member (swift-mode:token:text previous-token)
+     ((member (hylo-mode:token:text previous-token)
               '("class" "struct" "actor" "protocol" "enum" "extension" "func"
                 "typealias" "associatedtype" "precedencegroup" "operator"
                 "macro"))
@@ -701,7 +701,7 @@ return non-nil."
      ;; Insert implicit semicolon before modifiers.
      ;;
      ;; Preceding modifiers takes precedence over this.
-     ((member (swift-mode:token:text next-token)
+     ((member (hylo-mode:token:text next-token)
               '("indirect" "convenience" "dynamic" "final" "infix" "lazy"
                 "mutating" "nonmutating" "optional" "override" "postfix"
                 "prefix" "required" "static" "unowned" "weak" "internal"
@@ -712,46 +712,46 @@ return non-nil."
      ;; Inserts implicit semicolon around keywords that forms single keyword
      ;; statements.
      ((or
-       (member (swift-mode:token:text previous-token)
+       (member (hylo-mode:token:text previous-token)
                '("break" "continue" "fallthrough"))
-       (member (swift-mode:token:text next-token)
+       (member (hylo-mode:token:text next-token)
                '("break" "continue" "fallthrough")))
       t)
 
      ;; Suppress implicit semicolon after keywords that cannot end statements.
-     ((member (swift-mode:token:text previous-token)
+     ((member (hylo-mode:token:text previous-token)
               '("while" "for" "switch" "case" "default" "catch" "if" "guard"
                 "let" "var" "throw" "import" "async"))
       nil)
 
      ;; Inserts implicit semicolon before keywords that starts a new
      ;; statement.
-     ((member (swift-mode:token:text next-token)
+     ((member (hylo-mode:token:text next-token)
               '("for" "repeat" "case" "default" "defer" "do"
                 "guard" "let" "var" "throw" "import" "return"))
       t)
 
      ;; Suppress implicit semicolon after return.
-     ((equal (swift-mode:token:text previous-token) "return")
+     ((equal (hylo-mode:token:text previous-token) "return")
       nil)
 
      ;; Inserts implicit semicolon before `while' unless it is part of
      ;; `repeat...while'.
-     ((equal (swift-mode:token:text next-token) "while")
+     ((equal (hylo-mode:token:text next-token) "while")
       (save-excursion
         (not
          (and
-          (eq (swift-mode:token:type previous-token) '\})
+          (eq (hylo-mode:token:type previous-token) '\})
           (progn
             (backward-list)
-            (equal (swift-mode:token:text
-                    (swift-mode:backquote-identifier-if-after-dot
-                     (swift-mode:backward-token-simple)))
+            (equal (hylo-mode:token:text
+                    (hylo-mode:backquote-identifier-if-after-dot
+                     (hylo-mode:backward-token-simple)))
                    "repeat"))))))
 
      ;; Inserts implicit semicolon before keywords that behave like method
      ;; names.
-     ((member (swift-mode:token:text next-token)
+     ((member (hylo-mode:token:text next-token)
               '("get" "set" "willSet" "didSet" "subscript" "init" "deinit"))
       t)
 
@@ -764,17 +764,17 @@ return non-nil."
      ;;   class
      ;;
      ;; `protocol' is handled by the next rule
-     ((member (swift-mode:token:text next-token)
+     ((member (hylo-mode:token:text next-token)
               '("class" "struct" "actor" "enum" "extension" "func" "typealias"
                 "associatedtype" "precedencegroup" "macro"))
       t)
 
      ;; Inserts implicit semicolon before protocol unless it is followed by <.
-     ((equal "protocol" (swift-mode:token:text next-token))
-      (not (equal (swift-mode:token:text
+     ((equal "protocol" (hylo-mode:token:text next-token))
+      (not (equal (hylo-mode:token:text
                    (save-excursion
-                     (swift-mode:forward-token-simple)
-                     (swift-mode:forward-token-simple)))
+                     (hylo-mode:forward-token-simple)
+                     (hylo-mode:forward-token-simple)))
                   "<")))
 
      ;; Suppress implicit semicolon after keywords that behave like method
@@ -796,7 +796,7 @@ return non-nil."
      ;;   {
      ;;   }
      ;; }
-     ((member (swift-mode:token:text previous-token)
+     ((member (hylo-mode:token:text previous-token)
               '("set" "willSet" "didSet" "subscript" "init" "deinit"))
       nil)
 
@@ -804,7 +804,7 @@ return non-nil."
      ;;
      ;; Open square bracket for array indexing cannot appear at the start of a
      ;; line.
-     ;; https://github.com/apple/swift/blob/8d4b1cc3c47c7624d57f188d5b227152ccb03163/lib/Parse/ParseExpr.cpp#L1525
+     ;; https://github.com/apple/hylo/blob/8d4b1cc3c47c7624d57f188d5b227152ccb03163/lib/Parse/ParseExpr.cpp#L1525
      ;;
      ;; Note that the following pattern (i.e. after binary-operator) is handled
      ;; by above case.
@@ -813,7 +813,7 @@ return non-nil."
      ;;   [
      ;;     1
      ;;   ]
-     ((eq (swift-mode:token:type next-token) '\[) t)
+     ((eq (hylo-mode:token:type next-token) '\[) t)
 
      ;; Inserts implicit semicolon before open parenthesis, unless it is a
      ;; function parameter clause. Suppress implicit semicolon before function
@@ -821,7 +821,7 @@ return non-nil."
      ;;
      ;; Open parenthesis for function arguments cannot appear at the start of a
      ;; line.
-     ;; https://github.com/apple/swift/blob/8d4b1cc3c47c7624d57f188d5b227152ccb03163/lib/Parse/ParseExpr.cpp#L1251
+     ;; https://github.com/apple/hylo/blob/8d4b1cc3c47c7624d57f188d5b227152ccb03163/lib/Parse/ParseExpr.cpp#L1251
      ;;
      ;; Note that the following pattern (i.e. after binary-operator) is handled
      ;; by above case.
@@ -830,43 +830,43 @@ return non-nil."
      ;;   (
      ;;     1
      ;;   )
-     ((eq (swift-mode:token:type next-token) '\()
-      (not (swift-mode:function-parameter-clause-p)))
+     ((eq (hylo-mode:token:type next-token) '\()
+      (not (hylo-mode:function-parameter-clause-p)))
 
      ;; Suppress implicit semicolon after the beginning of an interpolated
      ;; expression.
-     ((eq (swift-mode:token:type previous-token)
+     ((eq (hylo-mode:token:type previous-token)
           'string-chunk-before-interpolated-expression)
       nil)
 
      ;; Otherwise, inserts implicit semicolon.
      (t t))))
 
-(defun swift-mode:function-parameter-clause-p ()
+(defun hylo-mode:function-parameter-clause-p ()
   "Return t if the cursor is before a function/macro parameter clause.
 
 Return nil otherwise."
   (save-excursion
-    (let* ((previous-token (swift-mode:backward-token-simple))
-           (previous-type (swift-mode:token:type previous-token)))
+    (let* ((previous-token (hylo-mode:backward-token-simple))
+           (previous-type (hylo-mode:token:type previous-token)))
       (cond
        ((eq previous-type '>)
         (and
          (/= (point)
              ;; FIXME: mutual dependency
-             (progn (swift-mode:try-backward-generic-parameters) (point)))
-         (swift-mode:function-parameter-clause-p)))
+             (progn (hylo-mode:try-backward-generic-parameters) (point)))
+         (hylo-mode:function-parameter-clause-p)))
        ((eq previous-type 'identifier)
-        (member (swift-mode:token:text (swift-mode:backward-token-simple))
+        (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
                 '("func" "macro")))
        (t nil)))))
 
-(defun swift-mode:supertype-colon-p ()
+(defun hylo-mode:supertype-colon-p ()
   "Return t if a colon at the cursor is the colon for supertype.
 
 That is supertype declaration or type declaration of let or var."
   (save-excursion
-    (let ((previous-token (swift-mode:backward-token-simple)))
+    (let ((previous-token (hylo-mode:backward-token-simple)))
       ;; class Foo<T>: Bar ← supertype colon
       ;; class Foo<T> : Bar ← supertype colon
       ;; class Foo<T where T: Bar<[(Int, String)]>> : Bar ← supertype colon
@@ -885,7 +885,7 @@ That is supertype declaration or type declaration of let or var."
       ;; }
       (or
        ;; FIXME case let Foo(x) where x is Foo<Int>
-       (eq (swift-mode:token:type previous-token) '>)
+       (eq (hylo-mode:token:type previous-token) '>)
        ;; class Foo: ← supertype colon
        ;; extension Foo: ← supertype colon
        ;; let foo: ← not a supertype colon
@@ -893,23 +893,23 @@ That is supertype declaration or type declaration of let or var."
        ;; protocol Foo {
        ;;   associatedtype Bar: Baz ← supertype colon
        ;; }
-       (member (swift-mode:token:text
-                (swift-mode:backquote-identifier-if-after-dot
-                 (swift-mode:backward-token-simple)))
+       (member (hylo-mode:token:text
+                (hylo-mode:backquote-identifier-if-after-dot
+                 (hylo-mode:backward-token-simple)))
                '("class" "extension" "enum" "struct" "actor" "protocol"
                  "typealias" "associatedtype"))))))
 
-(defvar swift-mode:in-recursive-call-of-case-colon-p nil
+(defvar hylo-mode:in-recursive-call-of-case-colon-p nil
   "Non-nil if `case-colon-p' is being evaluated.")
 
-(defun swift-mode:case-colon-p ()
+(defun hylo-mode:case-colon-p ()
   "Return non-nil if the colon at the cursor follows case or default label.
 
 Return nil otherwise."
-  (if swift-mode:in-recursive-call-of-case-colon-p
+  (if hylo-mode:in-recursive-call-of-case-colon-p
       nil
     (save-excursion
-      (setq swift-mode:in-recursive-call-of-case-colon-p t)
+      (setq hylo-mode:in-recursive-call-of-case-colon-p t)
       (unwind-protect
           (member
            ;; FIXME:
@@ -926,44 +926,44 @@ Return nil otherwise."
            ;; }
 
            ;; FIXME: mutual dependency
-           (swift-mode:token:text
-            (swift-mode:backward-sexps-until
+           (hylo-mode:token:text
+            (hylo-mode:backward-sexps-until
              '(implicit-\; \; { \( \[ "case" "default" ":")))
            '("case" "default"))
-        (setq swift-mode:in-recursive-call-of-case-colon-p nil)))))
+        (setq hylo-mode:in-recursive-call-of-case-colon-p nil)))))
 
-(defun swift-mode:anonymous-parameter-in-p ()
+(defun hylo-mode:anonymous-parameter-in-p ()
   "Return t if a `in' token at the cursor is for anonymous function parameters."
   (save-excursion
     (eq
      ;; FIXME: mutual dependency
-     (swift-mode:token:type (swift-mode:backward-sexps-until
+     (hylo-mode:token:type (hylo-mode:backward-sexps-until
                              '(\; { \( \[ "for")))
      '{)))
 
-(defun swift-mode:generic-parameter-clause-start-p ()
+(defun hylo-mode:generic-parameter-clause-start-p ()
   "Return t if the `<' at the cursor is a start of generic parameters.
 
 Return nil otherwise."
   (save-excursion
-    (or (member (swift-mode:token:text (swift-mode:backward-token-simple))
+    (or (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
                 '("init" "subscript"))
-        (member (swift-mode:token:text (swift-mode:backward-token-simple))
+        (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
                 '("typealias" "func" "enum" "struct" "actor" "class" "init"
                   "macro")))))
 
-(defun swift-mode:fix-operator-type (token)
+(defun hylo-mode:fix-operator-type (token)
   "Return new operator token with proper token type.
 
 Other properties are the same as the TOKEN."
   ;; Operator type (i.e. prefix, postfix, infix) is decided from spaces or
   ;; comments around the operator.
-  ;; https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html#//apple_ref/doc/uid/TP40014097-CH30-ID410
-  ;; https://github.com/apple/swift-evolution/blob/master/proposals/0037-clarify-comments-and-operators.md
+  ;; https://developer.apple.com/library/ios/documentation/Hylo/Conceptual/Hylo_Programming_Language/LexicalStructure.html#//apple_ref/doc/uid/TP40014097-CH30-ID410
+  ;; https://github.com/apple/hylo-evolution/blob/master/proposals/0037-clarify-comments-and-operators.md
   (let*
-      ((text (swift-mode:token:text token))
-       (start (swift-mode:token:start token))
-       (end (swift-mode:token:end token))
+      ((text (hylo-mode:token:text token))
+       (start (hylo-mode:token:start token))
+       (end (hylo-mode:token:end token))
        (has-preceding-space (or
                              (= start (point-min))
                              (memq (char-syntax (char-before start)) '(?  ?>))
@@ -984,9 +984,9 @@ Other properties are the same as the TOKEN."
                          ;; or operator declarations.
                          (goto-char start)
                          (member
-                          (swift-mode:token:text
-                           (swift-mode:backquote-identifier-if-after-dot
-                            (swift-mode:backward-token-simple)))
+                          (hylo-mode:token:text
+                           (hylo-mode:backquote-identifier-if-after-dot
+                            (hylo-mode:backward-token-simple)))
                           '("func" "operator"))))
        (type
         (cond
@@ -999,57 +999,57 @@ Other properties are the same as the TOKEN."
          (has-preceding-space 'prefix-operator)
          ((or has-following-space has-following-dot) 'postfix-operator)
          (t 'binary-operator))))
-    (swift-mode:token type text start end)))
+    (hylo-mode:token type text start end)))
 
-(defun swift-mode:backquote-identifier-if-after-dot (token)
+(defun hylo-mode:backquote-identifier-if-after-dot (token)
   "Backquote identifier TOKEN, including keywords, if it is after a dot.
 
 See SE-0071:
-https://github.com/apple/swift-evolution/blob/master/proposals/0071-member-keywords.md"
-  (if (and (string-match "^[a-z]" (swift-mode:token:text token))
+https://github.com/apple/hylo-evolution/blob/master/proposals/0071-member-keywords.md"
+  (if (and (string-match "^[a-z]" (hylo-mode:token:text token))
            (save-excursion
-             (goto-char (swift-mode:token:start token))
-             (equal (swift-mode:token:text (swift-mode:backward-token-simple))
+             (goto-char (hylo-mode:token:start token))
+             (equal (hylo-mode:token:text (hylo-mode:backward-token-simple))
                     ".")))
-      (swift-mode:token
+      (hylo-mode:token
        'identifier
-       (concat "`" (swift-mode:token:text token) "`")
-       (swift-mode:token:start token)
-       (swift-mode:token:end token))
+       (concat "`" (hylo-mode:token:text token) "`")
+       (hylo-mode:token:start token)
+       (hylo-mode:token:end token))
     token))
 
-(defun swift-mode:forward-token ()
+(defun hylo-mode:forward-token ()
   "Move point forward to the next position of the end of a token.
 
 Return the token object.  If no more tokens available, return a token with
 type `outside-of-buffer'."
   (let ((pos (point)))
-    (let ((chunk (swift-mode:chunk-after)))
-      (when (swift-mode:chunk:comment-p chunk)
-        (goto-char (swift-mode:chunk:start chunk))))
+    (let ((chunk (hylo-mode:chunk-after)))
+      (when (hylo-mode:chunk:comment-p chunk)
+        (goto-char (hylo-mode:chunk:start chunk))))
     (forward-comment (point-max))
     (cond
      ;; Outside of buffer
      ((eobp)
-      (swift-mode:token 'outside-of-buffer "" (point) (point)))
+      (hylo-mode:token 'outside-of-buffer "" (point) (point)))
 
      ;; Implicit semicolon
      ((and (< pos
               (save-excursion
-                (swift-mode:goto-non-comment-bol)
+                (hylo-mode:goto-non-comment-bol)
                 (point)))
-           (save-excursion (goto-char pos) (swift-mode:implicit-semi-p)))
+           (save-excursion (goto-char pos) (hylo-mode:implicit-semi-p)))
 
-      (swift-mode:token 'implicit-\;
+      (hylo-mode:token 'implicit-\;
                         (buffer-substring-no-properties pos (point))
                         pos
                         (point)))
 
      ;; Colon
      ((eq (char-after) ?:)
-      (swift-mode:token (cond
-                         ((swift-mode:supertype-colon-p) 'supertype-:)
-                         ((swift-mode:case-colon-p) 'case-:)
+      (hylo-mode:token (cond
+                         ((hylo-mode:supertype-colon-p) 'supertype-:)
+                         ((hylo-mode:case-colon-p) 'case-:)
                          (t ':))
                         ":"
                         (progn (forward-char) (1- (point)))
@@ -1058,45 +1058,45 @@ type `outside-of-buffer'."
      ;; Start of generic-parameter-clause
      ((and
        (eq (char-after) ?<)
-       (swift-mode:generic-parameter-clause-start-p))
-      (swift-mode:token '<
+       (hylo-mode:generic-parameter-clause-start-p))
+      (hylo-mode:token '<
                         "<"
                         (progn (forward-char) (1- (point)))
                         (point)))
 
      (t
-      (let ((token (swift-mode:forward-token-simple)))
-        (setq token (swift-mode:backquote-identifier-if-after-dot token))
+      (let ((token (hylo-mode:forward-token-simple)))
+        (setq token (hylo-mode:backquote-identifier-if-after-dot token))
 
-        (when (and (equal (swift-mode:token:text token) "in")
+        (when (and (equal (hylo-mode:token:text token) "in")
                    (save-excursion
-                     (goto-char (swift-mode:token:start token))
-                     (swift-mode:anonymous-parameter-in-p)))
+                     (goto-char (hylo-mode:token:start token))
+                     (hylo-mode:anonymous-parameter-in-p)))
           (setq token
-                (swift-mode:token
+                (hylo-mode:token
                  'anonymous-function-parameter-in
                  "in"
-                 (swift-mode:token:start token)
-                 (swift-mode:token:end token))))
+                 (hylo-mode:token:start token)
+                 (hylo-mode:token:end token))))
         token)))))
 
-(defun swift-mode:forward-token-simple ()
-  "Like `swift-mode:forward-token' without recursion.
+(defun hylo-mode:forward-token-simple ()
+  "Like `hylo-mode:forward-token' without recursion.
 
 This function does not return `implicit-;' or `type-:'."
   (forward-comment (point-max))
   (cond
    ;; Outside of buffer
    ((eobp)
-    (swift-mode:token 'outside-of-buffer "" (point) (point)))
+    (hylo-mode:token 'outside-of-buffer "" (point) (point)))
 
    ;; End of interpolated expression
    ((and (eq (char-after) ?\))
          (equal (get-text-property (point) 'syntax-table)
                 (string-to-syntax "|")))
     (let ((pos-after-comment (point)))
-      (swift-mode:forward-string-chunk)
-      (swift-mode:token
+      (hylo-mode:forward-string-chunk)
+      (hylo-mode:token
        'string-chunk-after-interpolated-expression
        (buffer-substring-no-properties pos-after-comment (point))
        pos-after-comment
@@ -1105,7 +1105,7 @@ This function does not return `implicit-;' or `type-:'."
    ;; Separators and parentheses
    ((memq (char-after) '(?, ?\; ?\{ ?\} ?\[ ?\] ?\( ?\) ?:))
     (forward-char)
-    (swift-mode:token (intern (string (char-before)))
+    (hylo-mode:token (intern (string (char-before)))
                       (string (char-before))
                       (1- (point))
                       (point)))
@@ -1118,7 +1118,7 @@ This function does not return `implicit-;' or `type-:'."
    ((and (eq (char-after) ?<)
          (looking-at "<\\([[:upper:][(]\\|protocol\\)"))
     (forward-char)
-    (swift-mode:token '< "<" (1- (point)) (point)))
+    (hylo-mode:token '< "<" (1- (point)) (point)))
 
    ;; Close angle bracket for type parameters
    ;;
@@ -1137,15 +1137,15 @@ This function does not return `implicit-;' or `type-:'."
            (skip-syntax-backward "w_")
            (looking-at "[[:upper:]_]")))
     (forward-char)
-    (swift-mode:token '> ">" (1- (point)) (point)))
+    (hylo-mode:token '> ">" (1- (point)) (point)))
 
    ;; Regex
    ((and (looking-at "#*/")
          (equal (get-text-property (match-beginning 0) 'syntax-table)
                 (string-to-syntax "|")))
     (let ((pos-after-comment (point)))
-      (swift-mode:forward-string-chunk)
-      (swift-mode:token
+      (hylo-mode:forward-string-chunk)
+      (hylo-mode:token
        'identifier
        (buffer-substring-no-properties pos-after-comment (point))
        pos-after-comment
@@ -1156,7 +1156,7 @@ This function does not return `implicit-;' or `type-:'."
    ;; Operators starts with a dot can contains dots. Other operators cannot
    ;; contain dots.
    ;;
-   ;; https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html#//apple_ref/swift/grammar/dot-operator-head
+   ;; https://developer.apple.com/library/ios/documentation/Hylo/Conceptual/Hylo_Programming_Language/LexicalStructure.html#//apple_ref/hylo/grammar/dot-operator-head
    ;; TODO Unicode operators
    ((looking-at "[-/=+!*%<>&|^~?]+\\|[.][-./=+!*%<>&|^~?]*")
     (let* ((text (match-string-no-properties 0))
@@ -1174,14 +1174,14 @@ This function does not return `implicit-;' or `type-:'."
         (setq end (- end (- (length text) (- (match-end 0) 1))))
         (setq text (substring text 0 (- (match-end 0) 1))))
       (goto-char end)
-      (swift-mode:fix-operator-type
-       (swift-mode:token nil text start end))))
+      (hylo-mode:fix-operator-type
+       (hylo-mode:token nil text start end))))
 
    ;; Backquoted identifier
    ((eq (char-after) ?`)
     (let ((pos-after-comment (point)))
-      (swift-mode:forward-string-chunk)
-      (swift-mode:token
+      (hylo-mode:forward-string-chunk)
+      (hylo-mode:token
        'identifier
        (buffer-substring-no-properties pos-after-comment (point))
        pos-after-comment
@@ -1192,8 +1192,8 @@ This function does not return `implicit-;' or `type-:'."
     (let ((pos-after-comment (point)))
       (skip-chars-forward "#")
       (forward-char)
-      (swift-mode:end-of-string)
-      (swift-mode:token
+      (hylo-mode:end-of-string)
+      (hylo-mode:token
        'identifier
        (buffer-substring-no-properties pos-after-comment (point))
        pos-after-comment
@@ -1211,7 +1211,7 @@ This function does not return `implicit-;' or `type-:'."
                   (forward-list 1))
               (scan-error (goto-char pos)))
           (goto-char pos)))
-      (swift-mode:token
+      (hylo-mode:token
        'attribute
        (buffer-substring-no-properties pos-after-comment (point))
        pos-after-comment
@@ -1239,51 +1239,51 @@ This function does not return `implicit-;' or `type-:'."
         (when (member (char-after) '(?? ?!))
           (forward-char)
           (setq text (concat text (list (char-before)))))
-        (swift-mode:token (if (member text '("as" "as?" "as!"))
+        (hylo-mode:token (if (member text '("as" "as?" "as!"))
                               'binary-operator
                             'prefix-operator)
                           text
                           (- (point) (length text))
                           (point)))
        ((equal text "is")
-        (swift-mode:token 'binary-operator
+        (hylo-mode:token 'binary-operator
                           text
                           (- (point) (length text))
                           (point)))
        ((member text '("await" "consume" "copy" "discard" "each"))
-        (swift-mode:token 'prefix-operator
+        (hylo-mode:token 'prefix-operator
                           text
                           (- (point) (length text))
                           (point)))
        (t
-        (swift-mode:token 'identifier
+        (hylo-mode:token 'identifier
                           text
                           (- (point) (length text))
                           (point))))))))
 
-(defun swift-mode:backward-token ()
+(defun hylo-mode:backward-token ()
   "Move point backward to the previous position of the end of a token.
 
 Return the token object.  If no more tokens available, return a token with
 type `outside-of-buffer'."
 
   (let ((pos (point)))
-    (let ((chunk (swift-mode:chunk-after)))
-      (when (swift-mode:chunk:comment-p chunk)
-        (goto-char (swift-mode:chunk:start chunk))))
+    (let ((chunk (hylo-mode:chunk-after)))
+      (when (hylo-mode:chunk:comment-p chunk)
+        (goto-char (hylo-mode:chunk:start chunk))))
     (forward-comment (- (point)))
     (cond
      ;; Outside of buffer
      ((bobp)
-      (swift-mode:token 'outside-of-buffer "" (point) (point)))
+      (hylo-mode:token 'outside-of-buffer "" (point) (point)))
 
      ;; Implicit semicolon
      ((and (< (save-excursion
-                (swift-mode:goto-non-comment-eol)
+                (hylo-mode:goto-non-comment-eol)
                 (point))
               pos)
-           (save-excursion (goto-char pos) (swift-mode:implicit-semi-p)))
-      (swift-mode:token 'implicit-\;
+           (save-excursion (goto-char pos) (hylo-mode:implicit-semi-p)))
+      (hylo-mode:token 'implicit-\;
                         (buffer-substring-no-properties (point) pos)
                         (point)
                         pos))
@@ -1291,9 +1291,9 @@ type `outside-of-buffer'."
      ;; Colon
      ((eq (char-before) ?:)
       (backward-char)
-      (swift-mode:token (cond
-                         ((swift-mode:supertype-colon-p) 'supertype-:)
-                         ((swift-mode:case-colon-p) 'case-:)
+      (hylo-mode:token (cond
+                         ((hylo-mode:supertype-colon-p) 'supertype-:)
+                         ((hylo-mode:case-colon-p) 'case-:)
                          (t ':))
                         ":"
                         (point)
@@ -1304,46 +1304,46 @@ type `outside-of-buffer'."
        (eq (char-before) ?<)
        (save-excursion
          (backward-char)
-         (swift-mode:generic-parameter-clause-start-p)))
+         (hylo-mode:generic-parameter-clause-start-p)))
       (backward-char)
-      (swift-mode:token '<
+      (hylo-mode:token '<
                         "<"
                         (point)
                         (1+ (point))))
 
      (t
-      (let ((token (swift-mode:backward-token-simple)))
-        (setq token (swift-mode:backquote-identifier-if-after-dot token))
+      (let ((token (hylo-mode:backward-token-simple)))
+        (setq token (hylo-mode:backquote-identifier-if-after-dot token))
 
-        (when (and (equal (swift-mode:token:text token) "in")
+        (when (and (equal (hylo-mode:token:text token) "in")
                    (save-excursion
-                     (goto-char (swift-mode:token:start token))
-                     (swift-mode:anonymous-parameter-in-p)))
+                     (goto-char (hylo-mode:token:start token))
+                     (hylo-mode:anonymous-parameter-in-p)))
           (setq token
-                (swift-mode:token
+                (hylo-mode:token
                  'anonymous-function-parameter-in
                  "in"
-                 (swift-mode:token:start token)
-                 (swift-mode:token:end token))))
+                 (hylo-mode:token:start token)
+                 (hylo-mode:token:end token))))
         token)))))
 
-(defun swift-mode:backward-token-simple ()
-  "Like `swift-mode:backward-token' without recursion.
+(defun hylo-mode:backward-token-simple ()
+  "Like `hylo-mode:backward-token' without recursion.
 
 This function does not return `implicit-;' or `type-:'."
   (forward-comment (- (point)))
   (cond
    ;; Outside of buffer
    ((bobp)
-    (swift-mode:token 'outside-of-buffer "" (point) (point)))
+    (hylo-mode:token 'outside-of-buffer "" (point) (point)))
 
    ;; Beginning of interpolated expression
    ((and (eq (char-before) ?\()
          (equal (get-text-property (1- (point)) 'syntax-table)
                 (string-to-syntax "|")))
     (let ((pos-before-comment (point)))
-      (swift-mode:backward-string-chunk)
-      (swift-mode:token
+      (hylo-mode:backward-string-chunk)
+      (hylo-mode:token
        'string-chunk-before-interpolated-expression
        (buffer-substring-no-properties (point) pos-before-comment)
        (point)
@@ -1360,7 +1360,7 @@ This function does not return `implicit-;' or `type-:'."
             (unless (eq (char-after) ?@)
               (goto-char (1- pos-before-comment))))
         (scan-error (goto-char (1- pos-before-comment))))
-      (swift-mode:token
+      (hylo-mode:token
        (if (eq (char-after) ?@) 'attribute '\))
        (buffer-substring-no-properties (point) pos-before-comment)
        (point)
@@ -1369,7 +1369,7 @@ This function does not return `implicit-;' or `type-:'."
    ;; Separators and parentheses
    ((memq (char-before) '(?, ?\; ?\{ ?\} ?\[ ?\] ?\( ?\) ?:))
     (backward-char)
-    (swift-mode:token (intern (string (char-after)))
+    (hylo-mode:token (intern (string (char-after)))
                       (string (char-after))
                       (point)
                       (1+ (point))))
@@ -1379,10 +1379,10 @@ This function does not return `implicit-;' or `type-:'."
          (eq (char-before (1- (point))) ?>)
          (save-excursion
            (backward-char)
-           (eq (swift-mode:token:type (swift-mode:backward-token-simple))
+           (eq (hylo-mode:token:type (hylo-mode:backward-token-simple))
                '>)))
     (backward-char)
-    (swift-mode:token (intern (string (char-after)))
+    (hylo-mode:token (intern (string (char-after)))
                       (string (char-after))
                       (point)
                       (1+ (point))))
@@ -1395,7 +1395,7 @@ This function does not return `implicit-;' or `type-:'."
    ((and (eq (char-before) ?<)
          (looking-at "\\([[:upper:][(]\\|protocol\\)"))
     (backward-char)
-    (swift-mode:token '< "<" (point) (1+ (point))))
+    (hylo-mode:token '< "<" (point) (1+ (point))))
 
    ;; Close angle bracket for type parameters
    ;;
@@ -1407,7 +1407,7 @@ This function does not return `implicit-;' or `type-:'."
            (skip-syntax-backward "w_")
            (looking-at "[[:upper:]_]")))
     (backward-char)
-    (swift-mode:token '> ">" (point) (1+ (point))))
+    (hylo-mode:token '> ">" (point) (1+ (point))))
 
    ;; Regex
    ((and (save-excursion
@@ -1416,8 +1416,8 @@ This function does not return `implicit-;' or `type-:'."
          (equal (get-text-property (1- (point)) 'syntax-table)
                 (string-to-syntax "|")))
     (let ((pos-before-comment (point)))
-      (swift-mode:backward-string-chunk)
-      (swift-mode:token
+      (hylo-mode:backward-string-chunk)
+      (hylo-mode:token
        'identifier
        (buffer-substring-no-properties (point) pos-before-comment)
        (point)
@@ -1428,7 +1428,7 @@ This function does not return `implicit-;' or `type-:'."
    ;; Operators which starts with a dot can contain other dots. Other
    ;; operators cannot contain dots.
    ;;
-   ;; https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html#//apple_ref/swift/grammar/dot-operator-head
+   ;; https://developer.apple.com/library/ios/documentation/Hylo/Conceptual/Hylo_Programming_Language/LexicalStructure.html#//apple_ref/hylo/grammar/dot-operator-head
    ;; TODO Unicode operators
    ((memq (char-before) '(?. ?- ?/ ?= ?+ ?! ?* ?% ?< ?> ?& ?| ?^ ?~ ??))
     (let ((point-before-comments (point)))
@@ -1456,14 +1456,14 @@ This function does not return `implicit-;' or `type-:'."
            (end (min point-before-comments (match-end 0)))
            (text (substring (match-string-no-properties 0) 0 (- end start))))
         (goto-char start)
-        (swift-mode:fix-operator-type
-         (swift-mode:token nil text start end)))))
+        (hylo-mode:fix-operator-type
+         (hylo-mode:token nil text start end)))))
 
    ;; Backquoted identifier
    ((eq (char-before) ?`)
     (let ((pos-before-comment (point)))
-      (swift-mode:backward-string-chunk)
-      (swift-mode:token
+      (hylo-mode:backward-string-chunk)
+      (hylo-mode:token
        'identifier
        (buffer-substring-no-properties (point) pos-before-comment)
        (point)
@@ -1476,8 +1476,8 @@ This function does not return `implicit-;' or `type-:'."
     (let ((pos-before-comment (point)))
       (skip-chars-backward "#")
       (backward-char)
-      (swift-mode:beginning-of-string)
-      (swift-mode:token
+      (hylo-mode:beginning-of-string)
+      (hylo-mode:token
        'identifier
        (buffer-substring-no-properties (point) pos-before-comment)
        (point)
@@ -1501,27 +1501,27 @@ This function does not return `implicit-;' or `type-:'."
            (t (backward-char) (string (char-after))))))
       (cond
        ((member text '("is" "as"))
-        (swift-mode:token 'binary-operator
+        (hylo-mode:token 'binary-operator
                           text
                           (point)
                           (+ (point) (length text))))
        ((member text '("try" "await" "consume" "copy" "discard" "each"))
-        (swift-mode:token 'prefix-operator
+        (hylo-mode:token 'prefix-operator
                           text
                           (point)
                           (+ (point) (length text))))
        ((string-prefix-p "@" text)
-        (swift-mode:token 'attribute
+        (hylo-mode:token 'attribute
                           text
                           (point)
                           (+ (point) (length text))))
        (t
-        (swift-mode:token 'identifier
+        (hylo-mode:token 'identifier
                           text
                           (point)
                           (+ (point) (length text)))))))))
 
-(defun swift-mode:forward-string-chunk ()
+(defun hylo-mode:forward-string-chunk ()
   "Skip forward a string chunk.
 
 A string chunk is a part of single-line/multiline string delimited with
@@ -1530,7 +1530,7 @@ quotation marks or interpolated expressions."
       (goto-char (scan-sexps (point) 1))
     (scan-error (goto-char (point-max)))))
 
-(defun swift-mode:backward-string-chunk ()
+(defun hylo-mode:backward-string-chunk ()
   "Skip backward a string chunk.
 
 A string chunk is a part of single-line/multiline string delimited with
@@ -1539,7 +1539,7 @@ quotation marks or interpolated expressions."
       (goto-char (scan-sexps (point) -1))
     (scan-error (goto-char (point-min)))))
 
-(defun swift-mode:beginning-of-string ()
+(defun hylo-mode:beginning-of-string ()
   "Move point to the beginning of single-line/multiline string.
 
 Assuming the cursor is on a string."
@@ -1548,122 +1548,122 @@ Assuming the cursor is on a string."
     (while (setq matching-parenthesis
                  (get-text-property
                   (point)
-                  'swift-mode:matching-parenthesis))
+                  'hylo-mode:matching-parenthesis))
       (goto-char matching-parenthesis)
       (goto-char (nth 8 (syntax-ppss))))
     (point)))
 
-(defun swift-mode:end-of-string ()
+(defun hylo-mode:end-of-string ()
   "Move point to the end of single-line/multiline string.
 
 Assuming the cursor is on a string."
   (goto-char (or (nth 8 (syntax-ppss)) (point)))
   (let (matching-parenthesis)
-    (swift-mode:forward-string-chunk)
+    (hylo-mode:forward-string-chunk)
     (while (setq matching-parenthesis
                  (get-text-property
                   (1- (point))
-                  'swift-mode:matching-parenthesis))
+                  'hylo-mode:matching-parenthesis))
       (goto-char matching-parenthesis)
-      (swift-mode:forward-string-chunk)))
+      (hylo-mode:forward-string-chunk)))
   (point))
 
-(defun swift-mode:goto-non-comment-bol ()
+(defun hylo-mode:goto-non-comment-bol ()
   "Back to the beginning of line that is not inside a comment."
   (forward-line 0)
   (let (chunk)
     (while (progn
-             (setq chunk (swift-mode:chunk-after))
-             (swift-mode:chunk:comment-p chunk))
+             (setq chunk (hylo-mode:chunk-after))
+             (hylo-mode:chunk:comment-p chunk))
       ;; The cursor is in a comment. Backs to the beginning of the comment.
-      (goto-char (swift-mode:chunk:start chunk))
+      (goto-char (hylo-mode:chunk:start chunk))
       (forward-line 0))))
 
-(defun swift-mode:goto-non-comment-eol ()
+(defun hylo-mode:goto-non-comment-eol ()
   "Proceed to the end of line that is not inside a comment.
 
 If this line ends with a single-line comment, goto just before the comment."
   (end-of-line)
   (let (chunk)
     (while (progn
-             (setq chunk (swift-mode:chunk-after))
-             (swift-mode:chunk:comment-p chunk))
+             (setq chunk (hylo-mode:chunk-after))
+             (hylo-mode:chunk:comment-p chunk))
       ;; The cursor is in a comment.
-      (if (swift-mode:chunk:single-line-comment-p chunk)
+      (if (hylo-mode:chunk:single-line-comment-p chunk)
           ;; This is a single-line comment
           ;; Back to the beginning of the comment.
-          (goto-char (swift-mode:chunk:start chunk))
+          (goto-char (hylo-mode:chunk:start chunk))
         ;; This is a multiline comment
         ;; Proceed to the end of the comment.
-        (goto-char (swift-mode:chunk:start chunk))
+        (goto-char (hylo-mode:chunk:start chunk))
         (forward-comment 1)
         (end-of-line)
-        (when (and (eobp) (swift-mode:chunk-after))
-          (goto-char (swift-mode:chunk:start (swift-mode:chunk-after))))))))
+        (when (and (eobp) (hylo-mode:chunk-after))
+          (goto-char (hylo-mode:chunk:start (hylo-mode:chunk-after))))))))
 
 ;;; Comment or string chunks
 
 ;; A chunk is either a string-chunk, regex, or a comment.
 ;; It have the type and the start position.
 
-(defun swift-mode:chunk (type start)
+(defun hylo-mode:chunk (type start)
   "Return a new chunk with TYPE and START position."
   (list type start))
 
-(defun swift-mode:chunk:type (chunk)
+(defun hylo-mode:chunk:type (chunk)
   "Return the type of the CHUNK."
   (nth 0 chunk))
 
-(defun swift-mode:chunk:start (chunk)
+(defun hylo-mode:chunk:start (chunk)
   "Return the start position of the CHUNK."
   (nth 1 chunk))
 
-(defun swift-mode:chunk:end (chunk)
+(defun hylo-mode:chunk:end (chunk)
   "Return the end position of the CHUNK."
   (save-excursion
     (goto-char (nth 1 chunk))
-    (if (swift-mode:chunk:comment-p chunk)
+    (if (hylo-mode:chunk:comment-p chunk)
         (forward-comment 1)
-      (swift-mode:forward-token))
+      (hylo-mode:forward-token))
     (point)))
 
-(defun swift-mode:chunk:comment-p (chunk)
+(defun hylo-mode:chunk:comment-p (chunk)
   "Return non-nil if the CHUNK is a comment."
-  (memq (swift-mode:chunk:type chunk) '(single-line-comment multiline-comment)))
+  (memq (hylo-mode:chunk:type chunk) '(single-line-comment multiline-comment)))
 
-(defun swift-mode:chunk:string-p (chunk)
+(defun hylo-mode:chunk:string-p (chunk)
   "Return non-nil if the CHUNK is a string."
-  (memq (swift-mode:chunk:type chunk) '(single-line-string multiline-string)))
+  (memq (hylo-mode:chunk:type chunk) '(single-line-string multiline-string)))
 
-(defun swift-mode:chunk:single-line-comment-p (chunk)
+(defun hylo-mode:chunk:single-line-comment-p (chunk)
   "Return non-nil if the CHUNK is a single-line comment."
-  (eq (swift-mode:chunk:type chunk) 'single-line-comment))
+  (eq (hylo-mode:chunk:type chunk) 'single-line-comment))
 
-(defun swift-mode:chunk:multiline-comment-p (chunk)
+(defun hylo-mode:chunk:multiline-comment-p (chunk)
   "Return non-nil if the CHUNK is a multiline comment."
-  (eq (swift-mode:chunk:type chunk) 'multiline-comment))
+  (eq (hylo-mode:chunk:type chunk) 'multiline-comment))
 
-(defun swift-mode:chunk:single-line-string-p (chunk)
+(defun hylo-mode:chunk:single-line-string-p (chunk)
   "Return non-nil if the CHUNK is a single-line string."
-  (eq (swift-mode:chunk:type chunk) 'single-line-string))
+  (eq (hylo-mode:chunk:type chunk) 'single-line-string))
 
-(defun swift-mode:chunk:multiline-string-p (chunk)
+(defun hylo-mode:chunk:multiline-string-p (chunk)
   "Return non-nil if the CHUNK is a multiline string."
-  (eq (swift-mode:chunk:type chunk) 'multiline-string))
+  (eq (hylo-mode:chunk:type chunk) 'multiline-string))
 
-(defun swift-mode:chunk:regex-p (chunk)
+(defun hylo-mode:chunk:regex-p (chunk)
   "Return non-nil if the CHUNK is a regex."
-  (eq (swift-mode:chunk:type chunk) 'regex))
+  (eq (hylo-mode:chunk:type chunk) 'regex))
 
-(defun swift-mode:chunk:pound-count (chunk)
+(defun hylo-mode:chunk:pound-count (chunk)
   "Return the number of pound signs before the start position of the CHUNK."
   (save-excursion
-    (goto-char (swift-mode:chunk:start chunk))
-    (swift-mode:beginning-of-string)
+    (goto-char (hylo-mode:chunk:start chunk))
+    (hylo-mode:beginning-of-string)
     (skip-chars-forward "#")
-    (- (swift-mode:chunk:start chunk) (point))))
+    (- (hylo-mode:chunk:start chunk) (point))))
 
-(defun swift-mode:chunk-after (&optional parser-state)
+(defun hylo-mode:chunk-after (&optional parser-state)
   "Return the chunk at the cursor.
 
 If the cursor is outside of strings and comments, return nil.
@@ -1682,28 +1682,28 @@ If PARSER-STATE is given, it is used instead of (syntax-ppss)."
       (cond
        ((save-excursion (goto-char (nth 8 parser-state))
                         (looking-at "#*\"\"\""))
-        (swift-mode:chunk 'multiline-string (nth 8 parser-state)))
+        (hylo-mode:chunk 'multiline-string (nth 8 parser-state)))
        ((save-excursion (goto-char (nth 8 parser-state))
                         (looking-at "#*/"))
-        (swift-mode:chunk 'regex (nth 8 parser-state)))
-       (t (swift-mode:chunk 'single-line-string (nth 8 parser-state)))))
+        (hylo-mode:chunk 'regex (nth 8 parser-state)))
+       (t (hylo-mode:chunk 'single-line-string (nth 8 parser-state)))))
 
      ((eq (nth 4 parser-state) t)
-      (swift-mode:chunk 'single-line-comment (nth 8 parser-state)))
+      (hylo-mode:chunk 'single-line-comment (nth 8 parser-state)))
 
      ((nth 4 parser-state)
-      (swift-mode:chunk 'multiline-comment (nth 8 parser-state)))
+      (hylo-mode:chunk 'multiline-comment (nth 8 parser-state)))
 
      ((and (eq (char-before) ?/) (eq (char-after) ?/))
-      (swift-mode:chunk 'single-line-comment (1- (point))))
+      (hylo-mode:chunk 'single-line-comment (1- (point))))
 
      ((and (eq (char-before) ?/) (eq (char-after) ?*))
-      (swift-mode:chunk 'multiline-comment (1- (point))))
+      (hylo-mode:chunk 'multiline-comment (1- (point))))
 
      (t
       nil))))
 
-(defun swift-mode:same-line-p (point1 point2)
+(defun hylo-mode:same-line-p (point1 point2)
   "Return non-nil if POINT1 and POINT2 is on the same line.
 
 Return nil otherwise."
@@ -1714,6 +1714,6 @@ Return nil otherwise."
        (goto-char point2)
        (line-beginning-position))))
 
-(provide 'swift-mode-lexer)
+(provide 'hylo-mode-lexer)
 
-;;; swift-mode-lexer.el ends here
+;;; hylo-mode-lexer.el ends here

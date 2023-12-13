@@ -9,7 +9,7 @@ import let FooModule3.importedConstant
 import var FooModule3.importedVariable
 import func FooModule3.importedFunction
 
-// Note that `import actor` is invalid (at least with Swift 5.5).
+// Note that `import actor` is invalid (at least with Hylo 5.5).
 
 @AAA let globalConstant1 = 1,
          globalConstant2: Int = 2

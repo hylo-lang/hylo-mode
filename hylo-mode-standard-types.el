@@ -1,4 +1,4 @@
-;;; swift-mode-standard-types.el --- Major-mode for Apple's Swift programming language, Standard Types. -*- lexical-binding: t -*-
+;;; hylo-mode-standard-types.el --- Major-mode for the Hylo programming language, Standard Types. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018-2020 taku0
 
@@ -26,7 +26,7 @@
 ;;; Code:
 
 
-(defconst swift-mode:foundation-types
+(defconst hylo-mode:foundation-types
   '("AcceptPolicy"
     "ActivationType"
     "ActivityOptions"
@@ -581,7 +581,7 @@
     "unichar")
   "Foundation types.")
 
-(defconst swift-mode:foundation-enum-cases
+(defconst hylo-mode:foundation-enum-cases
   '("DTDKind"
     "abbreviated"
     "abnormalClosure"
@@ -1068,7 +1068,7 @@
     "zlib")
   "Foundation enum cases.")
 
-(defconst swift-mode:foundation-methods
+(defconst hylo-mode:foundation-methods
   '("abbreviation"
     "abortParsing"
     "absoluteURL"
@@ -2305,7 +2305,7 @@
     "zip")
   "Foundation methods.")
 
-(defconst swift-mode:foundation-properties
+(defconst hylo-mode:foundation-properties
   '("ABPeoplePickerDisplayedPropertyDidChange"
     "ABPeoplePickerGroupSelectionDidChange"
     "ABPeoplePickerNameSelectionDidChange"
@@ -5351,7 +5351,7 @@
     "zip")
   "Foundation properties.")
 
-(defconst swift-mode:foundation-functions
+(defconst hylo-mode:foundation-functions
   '("CFBridgingRetain"
     "NSAllHashTableObjects"
     "NSAllMapTableKeys"
@@ -5472,7 +5472,7 @@
     "pow")
   "Foundation functions.")
 
-(defconst swift-mode:foundation-constants
+(defconst hylo-mode:foundation-constants
   '("HMCharacteristicPropertySupportsEvent"
     "NSASCIIStringEncoding"
     "NSAppleEventTimeOutDefault"
@@ -6110,7 +6110,7 @@
     "NS_UnknownByteOrder")
   "Foundation constants.")
 
-(defconst swift-mode:standard-types
+(defconst hylo-mode:standard-types
   '("ASCII"
     "AdditiveArithmetic"
     "AllCases"
@@ -6422,7 +6422,7 @@
     "_AppendKeyPath")
   "Built-in types.")
 
-(defconst swift-mode:standard-enum-cases
+(defconst hylo-mode:standard-enum-cases
   '("awayFromZero"
     "class"
     "closePunctuation"
@@ -6504,7 +6504,7 @@
     "valueNotFound")
   "Built-in enum cases.")
 
-(defconst swift-mode:standard-methods
+(defconst hylo-mode:standard-methods
   '("addProduct"
     "addingPercentEncoding"
     "addingProduct"
@@ -6762,7 +6762,7 @@
     "write")
   "Built-in methods.")
 
-(defconst swift-mode:standard-properties
+(defconst hylo-mode:standard-properties
   '("above"
     "aboveLeft"
     "aboveRight"
@@ -7019,7 +7019,7 @@
     "zero")
   "Built-in properties.")
 
-(defconst swift-mode:standard-functions
+(defconst hylo-mode:standard-functions
   '("abs"
     "assert"
     "assertionFailure"
@@ -7053,10 +7053,10 @@
     "zip")
   "Built-in functions.")
 
-(defconst swift-mode:standard-constants
+(defconst hylo-mode:standard-constants
   '()
   "Built-in constants.")
 
-(provide 'swift-mode-standard-types)
+(provide 'hylo-mode-standard-types)
 
-;;; swift-mode-standard-types.el ends here
+;;; hylo-mode-standard-types.el ends here

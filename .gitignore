@@ -2,5 +2,5 @@
 /.eldev/
 *.elc
 /dist/
-swift-mode-autoloads.el
-swift-mode-pkg.el
+hylo-mode-autoloads.el
+hylo-mode-pkg.el

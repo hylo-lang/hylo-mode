@@ -1,7 +1,7 @@
-// swift-mode:test:eval (setq-local swift-mode:basic-offset 4)
-// swift-mode:test:eval (setq-local swift-mode:parenthesized-expression-offset 2)
-// swift-mode:test:eval (setq-local swift-mode:multiline-statement-offset 2)
-// swift-mode:test:eval (setq-local swift-mode:switch-case-offset 0)
+// hylo-mode:test:eval (setq-local hylo-mode:basic-offset 4)
+// hylo-mode:test:eval (setq-local hylo-mode:parenthesized-expression-offset 2)
+// hylo-mode:test:eval (setq-local hylo-mode:multiline-statement-offset 2)
+// hylo-mode:test:eval (setq-local hylo-mode:switch-case-offset 0)
 
 // Import declaration
 
@@ -34,7 +34,7 @@ import
   Foo
   .+
 
-let x = 1  // swift-mode:test:known-bug
+let x = 1  // hylo-mode:test:known-bug
 
 // Constant declarations
 
@@ -569,7 +569,7 @@ enum Foo
 }
 
 // Struct declarations
-// See also types.swift
+// See also types.hylo
 
 @A
 fileprivate
@@ -854,16 +854,16 @@ func foo()
 
 
 // Value and Type Parameter Packs
-// https://github.com/apple/swift-evolution/blob/main/proposals/0393-parameter-packs.md#introduction
-// https://github.com/apple/swift-evolution/blob/main/proposals/0398-variadic-types.md
+// https://github.com/apple/hylo-evolution/blob/main/proposals/0393-parameter-packs.md#introduction
+// https://github.com/apple/hylo-evolution/blob/main/proposals/0398-variadic-types.md
 
 func constrain<each S: Sequence>(
   _: repeat
-    each // swift-mode:test:known-bug
-    S // swift-mode:test:known-bug
+    each // hylo-mode:test:known-bug
+    S // hylo-mode:test:known-bug
 ) where (
           repeat
-            ( // swift-mode:test:known-bug
+            ( // hylo-mode:test:known-bug
               each
                 S
             )

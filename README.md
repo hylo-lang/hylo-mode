@@ -1,24 +1,24 @@
 [![License GPL 3][badge-license]][copying]
 [![Run Tests][badge-run-test]][action-run-test]
-[![MELPA](https://melpa.org/packages/swift-mode-badge.svg)](https://melpa.org/#/swift-mode)
-[![MELPA](https://stable.melpa.org/packages/swift-mode-badge.svg)](https://melpa.org/#/swift-mode)
+[![MELPA](https://melpa.org/packages/hylo-mode-badge.svg)](https://melpa.org/#/hylo-mode)
+[![MELPA](https://stable.melpa.org/packages/hylo-mode-badge.svg)](https://melpa.org/#/hylo-mode)
 
-# swift-mode
+# hylo-mode
 
-Major-mode for Apple's [Swift programming language](https://developer.apple.com/swift/).
+Major-mode for Apple's [Hylo programming language](https://developer.apple.com/hylo/).
 
 ## Installation
 
-Install `swift-mode` package from MELPA.
+Install `hylo-mode` package from MELPA.
 
-To install without MELPA, download [latest release](https://github.com/swift-emacs/swift-mode/releases) and execute `M-x package-install-file` for the .tar archive.
+To install without MELPA, download [latest release](https://github.com/hylo-emacs/hylo-mode/releases) and execute `M-x package-install-file` for the .tar archive.
 
 ## Features
 
 - Font Lock
 - Indentation
 
-  ```swift
+  ```hylo
   switch foo {
   case let .P1(x)
          where
@@ -66,49 +66,49 @@ To install without MELPA, download [latest release](https://github.com/swift-ema
   A sentence is a statement outside comments or strings, or an ordinal sentence inside comments or strings.
 - `indent-new-comment-line`
 - [Imenu](https://www.gnu.org/software/emacs/manual/html_node/emacs/Imenu.html)
-- Running Swift REPL in a buffer (`M-x run-swift`)
-- Build Swift module (`M-x swift-mode:build-swift-module`)
-- Build iOS app (`M-x swift-mode:build-ios-app`)
-- Running debugger on Swift module (`M-x swift-mode:debug-swift-module`)
-- Running debugger on iOS app in simulator or device (`M-x swift-mode:debug-ios-app`)
+- Running Hylo REPL in a buffer (`M-x run-hylo`)
+- Build Hylo module (`M-x hylo-mode:build-hylo-module`)
+- Build iOS app (`M-x hylo-mode:build-ios-app`)
+- Running debugger on Hylo module (`M-x hylo-mode:debug-hylo-module`)
+- Running debugger on iOS app in simulator or device (`M-x hylo-mode:debug-ios-app`)
   ([`ios-deploy`](https://github.com/ios-control/ios-deploy) is required to debug on device).
 
-This package does not provide flycheck. See [flycheck-swift](https://github.com/swift-emacs/flycheck-swift).
+This package does not provide flycheck. See [flycheck-hylo](https://github.com/hylo-emacs/flycheck-hylo).
 
 ## Limitations
 
-Some syntax constructs removed from Swift 3.0 are not supported:
+Some syntax constructs removed from Hylo 3.0 are not supported:
 
 - C-style for-loop: `for var i = 1; i < 10; i++ { }`
 - Multiple assignments in single `if let`:
-  ```swift
+  ```hylo
   if let x = x,
          y = y {
   }
   ```
 
   Use multiple `let` instead:
-  ```swift
+  ```hylo
   if let x = x,
      let y = y {
   }
   ```
 
 Indentation may not accurate. For example, `foo(Bar < A, B > (c))` can be indented like either
-```swift
+```hylo
 foo(Bar < A,
     B > (c)) // Passing two Boolean arguments to foo
 ```
 or
-```swift
+```hylo
 foo(Bar < A,
           B > (c)) // Passing a new Bar with two type arguments and a value
 ```
-The Swift compiler disambiguates this case using tokens after `>`, but those tokens may not available at editing time. We use some heuristic for this.
+The Hylo compiler disambiguates this case using tokens after `>`, but those tokens may not available at editing time. We use some heuristic for this.
 
 Another example is difficulty of handling of colons. We have to pair all `?` and `:` of conditional operators to decide indentation of the below snippet. This is a future work.
 
-```swift
+```hylo
 switch foo {
   case let P(x) where x is Foo? ? a ? b : c ?? d : e ? f : g :
     h ? i?.j() : k()
@@ -121,7 +121,7 @@ switch foo {
 ```
 
 Yet another difficult case is consistency of blocks. We want to indent method chains like this:
-```swift
+```hylo
 var x = foo
   .then { x in
       aaa
@@ -133,7 +133,7 @@ var x = foo
 
 while we also want to indent the body of `if` like this:
 
-```swift
+```hylo
 if anotherVeryLongVariableName
      .veryLongPropertyName {
     aaa
@@ -144,14 +144,14 @@ That is, we have to indent the closing brace with offset if it is a part of expr
 
 Then, how should we indent the following code when the cursor is before `@`?
 
-```swift
+```hylo
 var x = foo
   .bar {
     @
 ```
 
 This could be
-```swift
+```hylo
 var x = foo
   .bar {
     @abc willSet {
@@ -161,7 +161,7 @@ var x = foo
 // property declaration
 ```
 or
-```swift
+```hylo
 var x = foo
   .bar {
       @abc var x = 1
@@ -172,9 +172,9 @@ var x = foo
 
 Both are syntactically correct code. We cannot handle this case properly. This is also a future work.
 
-Other example is regex literals and custom operators.  The following example is valid Swift code with regex literals and custom operators.
+Other example is regex literals and custom operators.  The following example is valid Hylo code with regex literals and custom operators.
 
-```swift
+```hylo
 let x = /^/ /^/ /^/
 ```
 
@@ -193,16 +193,16 @@ For other commands, run `make help`.
 
 ## Related projects
 
-- [Official swift-mode.el by Apple](https://github.com/apple/swift/blob/master/utils/swift-mode.el): Seems still in very early stage for now. We cannot contribute to it due to the license incompatibility.
-- [sourcekit-lsp](https://github.com/apple/sourcekit-lsp): Language Server Protocol implementation for Swift and C-based languages.
+- [Official hylo-mode.el by Apple](https://github.com/apple/hylo/blob/master/utils/hylo-mode.el): Seems still in very early stage for now. We cannot contribute to it due to the license incompatibility.
+- [sourcekit-lsp](https://github.com/apple/sourcekit-lsp): Language Server Protocol implementation for Hylo and C-based languages.
 - [lsp-sourcekit](https://github.com/emacs-lsp/lsp-sourcekit): Emacs client for lsp-sourcekit.
-- [swift-helpful](https://github.com/danielmartin/swift-helpful): Shows documentation about Swift keywords, attributes, and API.
-- [company-sourcekit](https://github.com/nathankot/company-sourcekit): Completion for Swift projects via SourceKit with the help of SourceKitten.
-- [flycheck-swift](https://github.com/swift-emacs/flycheck-swift): Flycheck extensions for Swift.
-- [swift-playground-mode](https://gitlab.com/michael.sanders/swift-playground-mode): Emacs support for Swift playgrounds.
-- [swift-format](https://github.com/apple/swift-format): Formatter for Swift by Apple (`swift format` command).
-- [SwiftRewriter](https://github.com/inamiy/SwiftRewriter): Formatter for Swift using SwiftSyntax.
-- [SwiftFormat](https://github.com/nicklockwood/SwiftFormat): Formatter for Swift.
+- [hylo-helpful](https://github.com/danielmartin/hylo-helpful): Shows documentation about Hylo keywords, attributes, and API.
+- [company-sourcekit](https://github.com/nathankot/company-sourcekit): Completion for Hylo projects via SourceKit with the help of SourceKitten.
+- [flycheck-hylo](https://github.com/hylo-emacs/flycheck-hylo): Flycheck extensions for Hylo.
+- [hylo-playground-mode](https://gitlab.com/michael.sanders/hylo-playground-mode): Emacs support for Hylo playgrounds.
+- [hylo-format](https://github.com/apple/hylo-format): Formatter for Hylo by Apple (`hylo format` command).
+- [HyloRewriter](https://github.com/inamiy/HyloRewriter): Formatter for Hylo using HyloSyntax.
+- [HyloFormat](https://github.com/nicklockwood/HyloFormat): Formatter for Hylo.
 
 ## Contributing
 
@@ -222,15 +222,15 @@ Thanks to the following original developer and users for their contributions:
 - [@uk-ar](https://github.com/uk-ar) (Yuuki Arisawa)
 - [@msanders](https://github.com/msanders) (Michael Sanders)
 
-You can find a [full list of those people here](https://github.com/swift-emacs/swift-mode/graphs/contributors).
+You can find a [full list of those people here](https://github.com/hylo-emacs/hylo-mode/graphs/contributors).
 
-Thanks to [@purcell](https://github.com/purcell) (Steve Purcell) for advices on the code and arrangement for merging `swift3-mode` and `swift-mode`.
+Thanks to [@purcell](https://github.com/purcell) (Steve Purcell) for advices on the code and arrangement for merging `hylo3-mode` and `hylo-mode`.
 
 ## License
 
 GPLv3. See [COPYING][] for details. Copyright (C) 2014-2021 taku0, Chris Barrett, Bozhidar Batsov, Arthur Evstifeev.
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
-[badge-run-test]: https://github.com/swift-emacs/swift-mode/workflows/Run%20Tests/badge.svg
-[action-run-test]: https://github.com/swift-emacs/swift-mode/actions?query=workflow%3A%22Run+Tests%22
+[badge-run-test]: https://github.com/hylo-emacs/hylo-mode/workflows/Run%20Tests/badge.svg
+[action-run-test]: https://github.com/hylo-emacs/hylo-mode/actions?query=workflow%3A%22Run+Tests%22
 [COPYING]: ./COPYING

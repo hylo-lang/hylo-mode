@@ -1,4 +1,4 @@
-;;; swift-mode-font-lock.el --- Major-mode for Apple's Swift programming language, Font Locks. -*- lexical-binding: t -*-
+;;; hylo-mode-font-lock.el --- Major-mode for the Hylo programming language, Font Locks. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014-2021 taku0, Chris Barrett, Bozhidar Batsov,
 ;;                         Arthur Evstifeev, Michael Sanders
@@ -30,102 +30,102 @@
 
 ;;; Code:
 
-(require 'swift-mode-standard-types)
+(require 'hylo-mode-standard-types)
 (require 'seq)
 (require 'subr-x)
 
 ;;; Customizations
 
 ;;;###autoload
-(defgroup swift-mode:faces nil
+(defgroup hylo-mode:faces nil
   "Font faces."
-  :group 'swift)
+  :group 'hylo)
 
-(defcustom swift-mode:highlight-symbols-in-standard-library
+(defcustom hylo-mode:highlight-symbols-in-standard-library
   t
   "Highlight symbols in the standard library."
   :type 'boolean
   :safe #'booleanp)
 
-(defcustom swift-mode:highlight-symbols-in-foundation-framework
+(defcustom hylo-mode:highlight-symbols-in-foundation-framework
   t
   "Highlight symbols in the Foundation framework."
   :type 'boolean
   :safe #'booleanp)
 
-(defface swift-mode:constant-keyword-face
+(defface hylo-mode:constant-keyword-face
   '((t . (:inherit font-lock-constant-face)))
   "Face for highlighting constant keywords.
 
 That is, true, false, and nil.")
 
-(defface swift-mode:preprocessor-keyword-face
+(defface hylo-mode:preprocessor-keyword-face
   '((t . (:inherit font-lock-preprocessor-face)))
   "Face for highlighting preprocessor keywords.
 
 Example: #if, #endif, and #selector.")
 
-(defface swift-mode:keyword-face
+(defface hylo-mode:keyword-face
   '((t . (:inherit font-lock-keyword-face)))
   "Face for highlighting keywords.")
 
-(defface swift-mode:builtin-method-trailing-closure-face
+(defface hylo-mode:builtin-method-trailing-closure-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin methods with trailing closure.")
 
-(defface swift-mode:builtin-method-face
+(defface hylo-mode:builtin-method-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin methods.")
 
-(defface swift-mode:builtin-function-trailing-closure-face
+(defface hylo-mode:builtin-function-trailing-closure-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin functions with trailing closure.")
 
-(defface swift-mode:builtin-function-face
+(defface hylo-mode:builtin-function-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin functions.")
 
-(defface swift-mode:builtin-property-face
+(defface hylo-mode:builtin-property-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin properties.")
 
-(defface swift-mode:builtin-constant-face
+(defface hylo-mode:builtin-constant-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin constants.")
 
-(defface swift-mode:builtin-enum-case-face
+(defface hylo-mode:builtin-enum-case-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin enum cases.")
 
-(defface swift-mode:build-config-keyword-face
+(defface hylo-mode:build-config-keyword-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting build configuration keywords.")
 
-(defface swift-mode:builtin-type-face
+(defface hylo-mode:builtin-type-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin types.")
 
-(defface swift-mode:builtin-precedence-group-face
+(defface hylo-mode:builtin-precedence-group-face
   '((t . (:inherit font-lock-builtin-face)))
   "Face for highlighting builtin precedence groups.")
 
-(defface swift-mode:function-call-face
+(defface hylo-mode:function-call-face
   '((t . (:inherit font-lock-function-name-face)))
   "Face for highlighting function calls.")
 
-(defface swift-mode:function-name-face
+(defface hylo-mode:function-name-face
   '((t . (:inherit font-lock-function-name-face)))
   "Face for highlighting function names.")
 
-(defface swift-mode:property-access-face
+(defface hylo-mode:property-access-face
   '((t . (:inherit font-lock-variable-name-face)))
   "Face for highlighting property accesses.")
 
-(defface swift-mode:negation-char-face
+(defface hylo-mode:negation-char-face
   '((t . (:inherit font-lock-negation-char-face)))
   "Face for highlighting the negation char.")
 
-(defun swift-mode:make-set (list)
+(defun hylo-mode:make-set (list)
   "Return a hash where its keys are elements of the LIST.
 
 All values are t."
@@ -134,58 +134,58 @@ All values are t."
       (puthash value t hash))
     hash))
 
-(defvar swift-mode:standard-types-hash
-  (swift-mode:make-set swift-mode:standard-types)
+(defvar hylo-mode:standard-types-hash
+  (hylo-mode:make-set hylo-mode:standard-types)
   "Set of standard type names.  All values are t.")
 
-(defvar swift-mode:standard-enum-cases-hash
-  (swift-mode:make-set swift-mode:standard-enum-cases)
+(defvar hylo-mode:standard-enum-cases-hash
+  (hylo-mode:make-set hylo-mode:standard-enum-cases)
   "Set of standard enum case names.  All values are t.")
 
-(defvar swift-mode:standard-methods-hash
-  (swift-mode:make-set swift-mode:standard-methods)
+(defvar hylo-mode:standard-methods-hash
+  (hylo-mode:make-set hylo-mode:standard-methods)
   "Set of standard method names.  All values are t.")
 
-(defvar swift-mode:standard-properties-hash
-  (swift-mode:make-set swift-mode:standard-properties)
+(defvar hylo-mode:standard-properties-hash
+  (hylo-mode:make-set hylo-mode:standard-properties)
   "Set of standard property names.  All values are t.")
 
-(defvar swift-mode:standard-functions-hash
-  (swift-mode:make-set swift-mode:standard-functions)
+(defvar hylo-mode:standard-functions-hash
+  (hylo-mode:make-set hylo-mode:standard-functions)
   "Set of standard function names.  All values are t.")
 
-(defvar swift-mode:standard-constants-hash
-  (swift-mode:make-set swift-mode:standard-constants)
+(defvar hylo-mode:standard-constants-hash
+  (hylo-mode:make-set hylo-mode:standard-constants)
   "Set of standard constant names.  All values are t.")
 
-(defvar swift-mode:foundation-types-hash
-  (swift-mode:make-set swift-mode:foundation-types)
+(defvar hylo-mode:foundation-types-hash
+  (hylo-mode:make-set hylo-mode:foundation-types)
   "Set of Foundation type names.  All values are t.")
 
-(defvar swift-mode:foundation-enum-cases-hash
-  (swift-mode:make-set swift-mode:foundation-enum-cases)
+(defvar hylo-mode:foundation-enum-cases-hash
+  (hylo-mode:make-set hylo-mode:foundation-enum-cases)
   "Set of Foundation enum case names.  All values are t.")
 
-(defvar swift-mode:foundation-methods-hash
-  (swift-mode:make-set swift-mode:foundation-methods)
+(defvar hylo-mode:foundation-methods-hash
+  (hylo-mode:make-set hylo-mode:foundation-methods)
   "Set of Foundation method names.  All values are t.")
 
-(defvar swift-mode:foundation-properties-hash
-  (swift-mode:make-set swift-mode:foundation-properties)
+(defvar hylo-mode:foundation-properties-hash
+  (hylo-mode:make-set hylo-mode:foundation-properties)
   "Set of Foundation property names.  All values are t.")
 
-(defvar swift-mode:foundation-functions-hash
-  (swift-mode:make-set swift-mode:foundation-functions)
+(defvar hylo-mode:foundation-functions-hash
+  (hylo-mode:make-set hylo-mode:foundation-functions)
   "Set of Foundation function names.  All values are t.")
 
-(defvar swift-mode:foundation-constants-hash
-  (swift-mode:make-set swift-mode:foundation-constants)
+(defvar hylo-mode:foundation-constants-hash
+  (hylo-mode:make-set hylo-mode:foundation-constants)
   "Set of Foundation constant names.  All values are t.")
 
 
 ;;; Supporting functions
 
-(defun swift-mode:declared-function-name-pos-p (pos limit)
+(defun hylo-mode:declared-function-name-pos-p (pos limit)
   "Return t if POS is just before the name of a function declaration.
 
 This function does not search beyond LIMIT."
@@ -202,7 +202,7 @@ This function does not search beyond LIMIT."
       "\\|")
      "\\)\\>"))))
 
-(defun swift-mode:property-access-pos-p (pos limit)
+(defun hylo-mode:property-access-pos-p (pos limit)
   "Return t if POS is just before the property name of a member expression.
 
 This function does not search beyond LIMIT."
@@ -245,7 +245,7 @@ This function does not search beyond LIMIT."
      (skip-syntax-forward " " limit)
      (not (eq (char-after) ?\()))))
 
-(defun swift-mode:builtin-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-name-pos-p (names pos limit)
   "Return t if an identifier in the hash NAMES appears at POS.
 
 This function does not search beyond LIMIT."
@@ -253,21 +253,21 @@ This function does not search beyond LIMIT."
   (skip-syntax-forward "w_" limit)
   (gethash (buffer-substring-no-properties pos (point)) names))
 
-(defun swift-mode:builtin-type-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-type-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin type name in NAMES.
 
 This function does not search beyond LIMIT."
-  (swift-mode:builtin-name-pos-p names pos limit))
+  (hylo-mode:builtin-name-pos-p names pos limit))
 
-(defun swift-mode:builtin-enum-case-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-enum-case-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin enum case name in NAMES.
 
 This function does not search beyond LIMIT."
   (and
    (eq (char-before pos) ?.)
-   (swift-mode:builtin-name-pos-p names pos limit)))
+   (hylo-mode:builtin-name-pos-p names pos limit)))
 
-(defun swift-mode:builtin-method-trailing-closure-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-method-trailing-closure-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin method name in NAMES.
 
 It must followed by open curly bracket.
@@ -280,9 +280,9 @@ This function does not search beyond LIMIT."
      (skip-chars-forward "?")
      (skip-syntax-forward " " limit)
      (eq (char-after) ?{))
-   (swift-mode:builtin-name-pos-p names pos limit)))
+   (hylo-mode:builtin-name-pos-p names pos limit)))
 
-(defun swift-mode:builtin-method-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-method-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin method name in NAMES.
 
 This function does not search beyond LIMIT."
@@ -294,17 +294,17 @@ This function does not search beyond LIMIT."
      (skip-chars-forward "?")
      (skip-syntax-forward " " limit)
      (eq (char-after) ?\())
-   (swift-mode:builtin-name-pos-p names pos limit)))
+   (hylo-mode:builtin-name-pos-p names pos limit)))
 
-(defun swift-mode:builtin-property-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-property-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin property name in NAMES.
 
 This function does not search beyond LIMIT."
   (and
-   (swift-mode:property-access-pos-p pos limit)
-   (swift-mode:builtin-name-pos-p names pos limit)))
+   (hylo-mode:property-access-pos-p pos limit)
+   (hylo-mode:builtin-name-pos-p names pos limit)))
 
-(defun swift-mode:builtin-function-trailing-closure-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-function-trailing-closure-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin function name in NAMES.
 
 It must followed by open curly bracket.
@@ -316,9 +316,9 @@ This function does not search beyond LIMIT."
      (skip-chars-forward "?")
      (skip-syntax-forward " " limit)
      (eq (char-after) ?{))
-   (swift-mode:builtin-name-pos-p names pos limit)))
+   (hylo-mode:builtin-name-pos-p names pos limit)))
 
-(defun swift-mode:builtin-function-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-function-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin function name in NAMES.
 
 This function does not search beyond LIMIT."
@@ -329,15 +329,15 @@ This function does not search beyond LIMIT."
      (skip-chars-forward "?")
      (skip-syntax-forward " " limit)
      (eq (char-after) ?\())
-   (swift-mode:builtin-name-pos-p names pos limit)))
+   (hylo-mode:builtin-name-pos-p names pos limit)))
 
-(defun swift-mode:builtin-constant-name-pos-p (names pos limit)
+(defun hylo-mode:builtin-constant-name-pos-p (names pos limit)
   "Return t if POS is just before a builtin constant name in NAMES.
 
 This function does not search beyond LIMIT."
-  (swift-mode:builtin-name-pos-p names pos limit))
+  (hylo-mode:builtin-name-pos-p names pos limit))
 
-(defun swift-mode:font-lock-match-expr (limit match-p)
+(defun hylo-mode:font-lock-match-expr (limit match-p)
   "Move the cursor just after an identifier that satisfy given predicate.
 
 Set `match-data', and return t if the identifier found before position LIMIT.
@@ -357,23 +357,23 @@ The predicate MATCH-P is called with two arguments:
         (setq result t)))
     result))
 
-(defun swift-mode:font-lock-match-declared-function-names (limit)
+(defun hylo-mode:font-lock-match-declared-function-names (limit)
   "Move the cursor just after a function name or others.
 
 Others includes enum, struct, class, protocol, and extension name.
 Set `match-data', and return t if a function name or others found before
 position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-expr
-   limit #'swift-mode:declared-function-name-pos-p))
+  (hylo-mode:font-lock-match-expr
+   limit #'hylo-mode:declared-function-name-pos-p))
 
-(defun swift-mode:font-lock-match-property-access (limit)
+(defun hylo-mode:font-lock-match-property-access (limit)
   "Move the cursor just after a property access.
 Set `match-data', and return t if a property access found before position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-expr limit #'swift-mode:property-access-pos-p))
+  (hylo-mode:font-lock-match-expr limit #'hylo-mode:property-access-pos-p))
 
-(defmacro swift-mode:font-lock-match-builtin-names (f limit &rest list-of-sets)
+(defmacro hylo-mode:font-lock-match-builtin-names (f limit &rest list-of-sets)
   "Move the cursor just after a builtin name.
 
 Function F takes set of names, position, and limit.
@@ -386,7 +386,7 @@ LIST-OF-SETS is a list of set of names."
         (limit2 (make-symbol "limit"))
         (matched (make-symbol "matched"))
         (names (make-symbol "names")))
-    `(swift-mode:font-lock-match-expr
+    `(hylo-mode:font-lock-match-expr
       ,limit
       (lambda (,pos ,limit2)
         (seq-reduce
@@ -397,129 +397,129 @@ LIST-OF-SETS is a list of set of names."
          (list ,@list-of-sets)
          nil)))))
 
-(defun swift-mode:font-lock-match-builtin-type-names (limit)
+(defun hylo-mode:font-lock-match-builtin-type-names (limit)
   "Move the cursor just after a builtin type name.
 
 Set `match-data', and return t if a builtin type name found before position
 LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-type-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-type-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-types-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-types-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-types-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-types-hash)))
 
-(defun swift-mode:font-lock-match-builtin-enum-case-names (limit)
+(defun hylo-mode:font-lock-match-builtin-enum-case-names (limit)
   "Move the cursor just after a builtin enum case name.
 
 Set `match-data', and return t if a builtin enum case name found before
 position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-enum-case-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-enum-case-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-enum-cases-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-enum-cases-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-enum-cases-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-enum-cases-hash)))
 
-(defun swift-mode:font-lock-match-builtin-method-trailing-closure-names (limit)
+(defun hylo-mode:font-lock-match-builtin-method-trailing-closure-names (limit)
   "Move the cursor just after a builtin method name with trailing closure.
 
 Set `match-data', and return t if a builtin method name found before position
 LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-method-trailing-closure-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-method-trailing-closure-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-methods-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-methods-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-methods-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-methods-hash)))
 
-(defun swift-mode:font-lock-match-builtin-method-names (limit)
+(defun hylo-mode:font-lock-match-builtin-method-names (limit)
   "Move the cursor just after a builtin method name.
 
 Set `match-data', and return t if a builtin method name found before
 position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-method-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-method-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-methods-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-methods-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-methods-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-methods-hash)))
 
-(defun swift-mode:font-lock-match-builtin-property-names (limit)
+(defun hylo-mode:font-lock-match-builtin-property-names (limit)
   "Move the cursor just after a builtin property name.
 
 Set `match-data', and return t if a builtin property name found before
 position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-property-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-property-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-properties-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-properties-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-properties-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-properties-hash)))
 
-(defun swift-mode:font-lock-match-builtin-function-trailing-closure-names
+(defun hylo-mode:font-lock-match-builtin-function-trailing-closure-names
     (limit)
   "Move the cursor just after a builtin function name with trailing closure.
 
 Set `match-data', and return t if a builtin function name found before
 position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-function-trailing-closure-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-function-trailing-closure-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-functions-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-functions-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-functions-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-functions-hash)))
 
-(defun swift-mode:font-lock-match-builtin-function-names (limit)
+(defun hylo-mode:font-lock-match-builtin-function-names (limit)
   "Move the cursor just after a builtin function name.
 
 Set `match-data', and return t if a builtin function name found before
 position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-function-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-function-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-functions-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-functions-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-functions-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-functions-hash)))
 
-(defun swift-mode:font-lock-match-builtin-constant-names (limit)
+(defun hylo-mode:font-lock-match-builtin-constant-names (limit)
   "Move the cursor just after a builtin constant name.
 
 Set `match-data', and return t if a builtin constant name found before
 position LIMIT.
 Return nil otherwise."
-  (swift-mode:font-lock-match-builtin-names
-   #'swift-mode:builtin-constant-name-pos-p
+  (hylo-mode:font-lock-match-builtin-names
+   #'hylo-mode:builtin-constant-name-pos-p
    limit
-   (and swift-mode:highlight-symbols-in-standard-library
-        swift-mode:standard-constants-hash)
-   (and swift-mode:highlight-symbols-in-foundation-framework
-        swift-mode:foundation-constants-hash)))
+   (and hylo-mode:highlight-symbols-in-standard-library
+        hylo-mode:standard-constants-hash)
+   (and hylo-mode:highlight-symbols-in-foundation-framework
+        hylo-mode:foundation-constants-hash)))
 
 ;;; Keywords and standard identifiers
 
 ;; Keywords
-;; https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html#//apple_ref/doc/uid/TP40014097-CH30-ID410
+;; https://developer.apple.com/library/ios/documentation/Hylo/Conceptual/Hylo_Programming_Language/LexicalStructure.html#//apple_ref/doc/uid/TP40014097-CH30-ID410
 
-(defconst swift-mode:constant-keywords
+(defconst hylo-mode:constant-keywords
   '("true" "false" "nil")
   "Keywords used as constants.")
 
-(defconst swift-mode:declaration-keywords
+(defconst hylo-mode:declaration-keywords
   '("associatedtype" "class" "deinit" "enum" "extension" "fileprivate" "func"
     "import" "init" "inout" "internal" "let" "open" "operator" "package"
     "private" "protocol" "public" "any" "some" "static" "struct" "subscript"
@@ -527,19 +527,19 @@ Return nil otherwise."
     "borrowing" "consuming" "macro")
   "Keywords used in declarations.")
 
-(defconst swift-mode:statement-keywords
+(defconst hylo-mode:statement-keywords
   '("break" "case" "continue" "default" "defer" "do" "else" "fallthrough" "for"
     "guard" "if" "in" "repeat" "return" "switch" "where" "while")
   "Keywords used in statements.")
 
-(defconst swift-mode:expression-keywords
+(defconst hylo-mode:expression-keywords
   '("as" "catch" "dynamicType" "is" "rethrows" "super" "self" "Self" "throws"
     "throw" "try" "async" "await" "consume" "copy" "discard" "each")
   "Keywords used in expressions and types.
 
 Excludes true, false, and keywords begin with a number sign.")
 
-(defconst swift-mode:context-keywords
+(defconst hylo-mode:context-keywords
   '("Protocol" "Type" "and" "assignment" "associativity" "convenience" "didSet"
     "dynamic" "final" "get" "higherThan" "indirect" "infix" "lazy" "left"
     "lowerThan" "mutating" "none" "nonmutating" "optional" "override" "postfix"
@@ -547,8 +547,8 @@ Excludes true, false, and keywords begin with a number sign.")
     "weak" "willSet")
   "Keywords reserved in particular contexts.")
 
-(defconst swift-mode:build-config-keywords
-  '("os" "arch" "swift" "compiler" "canImport" "targetEnvironment"
+(defconst hylo-mode:build-config-keywords
+  '("os" "arch" "hylo" "compiler" "canImport" "targetEnvironment"
     "i386" "x86_64" "arm" "arm64"
     "OSX" "OSXApplicationExtension"
     "macOS" "macOSApplicationExtension"
@@ -562,7 +562,7 @@ Excludes true, false, and keywords begin with a number sign.")
     "message" "renamed")
   "Keywords for build configuration statements.")
 
-(defconst swift-mode:standard-precedence-groups
+(defconst hylo-mode:standard-precedence-groups
   '("AssignmentPrecedence"
     "FunctionArrowPrecedence"
     "TernaryPrecedence"
@@ -580,92 +580,92 @@ Excludes true, false, and keywords begin with a number sign.")
 
 ;;; font-lock definition
 
-(defconst swift-mode:font-lock-keywords
+(defconst hylo-mode:font-lock-keywords
   `(
     ;; Attributes
     "@\\(\\sw\\|\\s_\\)*"
 
-    (,(regexp-opt swift-mode:constant-keywords 'words)
+    (,(regexp-opt hylo-mode:constant-keywords 'words)
      .
-     'swift-mode:constant-keyword-face)
+     'hylo-mode:constant-keyword-face)
 
     ;; Preprocessor keywords
     (,"#\\(\\sw\\|\\s_\\)*"
      .
-     'swift-mode:preprocessor-keyword-face)
+     'hylo-mode:preprocessor-keyword-face)
 
-    (,(regexp-opt (append swift-mode:declaration-keywords
-                          swift-mode:statement-keywords
-                          swift-mode:expression-keywords
-                          swift-mode:context-keywords)
+    (,(regexp-opt (append hylo-mode:declaration-keywords
+                          hylo-mode:statement-keywords
+                          hylo-mode:expression-keywords
+                          hylo-mode:context-keywords)
                   'words)
      .
-     'swift-mode:keyword-face)
+     'hylo-mode:keyword-face)
 
-    (swift-mode:font-lock-match-builtin-type-names
+    (hylo-mode:font-lock-match-builtin-type-names
      .
-     'swift-mode:builtin-type-face)
+     'hylo-mode:builtin-type-face)
 
-    (swift-mode:font-lock-match-builtin-enum-case-names
+    (hylo-mode:font-lock-match-builtin-enum-case-names
      .
-     'swift-mode:builtin-enum-case-face)
+     'hylo-mode:builtin-enum-case-face)
 
-    (swift-mode:font-lock-match-builtin-method-trailing-closure-names
+    (hylo-mode:font-lock-match-builtin-method-trailing-closure-names
      .
-     'swift-mode:builtin-method-trailing-closure-face)
+     'hylo-mode:builtin-method-trailing-closure-face)
 
-    (swift-mode:font-lock-match-builtin-method-names
+    (hylo-mode:font-lock-match-builtin-method-names
      .
-     'swift-mode:builtin-method-face)
+     'hylo-mode:builtin-method-face)
 
-    (swift-mode:font-lock-match-builtin-property-names
+    (hylo-mode:font-lock-match-builtin-property-names
      .
-     'swift-mode:builtin-property-face)
+     'hylo-mode:builtin-property-face)
 
-    (swift-mode:font-lock-match-builtin-function-trailing-closure-names
+    (hylo-mode:font-lock-match-builtin-function-trailing-closure-names
      .
-     'swift-mode:builtin-function-trailing-closure-face)
+     'hylo-mode:builtin-function-trailing-closure-face)
 
-    (swift-mode:font-lock-match-builtin-function-names
+    (hylo-mode:font-lock-match-builtin-function-names
      .
-     'swift-mode:builtin-function-face)
+     'hylo-mode:builtin-function-face)
 
-    (swift-mode:font-lock-match-builtin-constant-names
+    (hylo-mode:font-lock-match-builtin-constant-names
      .
-     'swift-mode:builtin-constant-face)
+     'hylo-mode:builtin-constant-face)
 
-    (,(regexp-opt swift-mode:build-config-keywords 'words)
+    (,(regexp-opt hylo-mode:build-config-keywords 'words)
      .
-     'swift-mode:build-config-keyword-face)
+     'hylo-mode:build-config-keyword-face)
 
     (,(concat "\\<"
-              (regexp-opt swift-mode:standard-precedence-groups 'non-nil)
+              (regexp-opt hylo-mode:standard-precedence-groups 'non-nil)
               "\\>")
      .
-     'swift-mode:builtin-precedence-group-face)
+     'hylo-mode:builtin-precedence-group-face)
 
     ;; Function and type declarations
-    (swift-mode:font-lock-match-declared-function-names
+    (hylo-mode:font-lock-match-declared-function-names
      .
-     'swift-mode:function-name-face)
+     'hylo-mode:function-name-face)
 
     ;; Method/function calls
     ("\\<\\(\\(\\sw\\|\\s_\\)+\\)\\>\\??\\s-*("
      1
-     'swift-mode:function-call-face)
+     'hylo-mode:function-call-face)
 
     ;; Property accesses
-    (swift-mode:font-lock-match-property-access
+    (hylo-mode:font-lock-match-property-access
      .
-     'swift-mode:property-access-face)
+     'hylo-mode:property-access-face)
 
     ;; Make negation chars easier to see
     ("\\(?:^\\|\\s-\\|\\s(\\|\\s>\\|[,:;]\\)\\(!+\\)[^=]"
      1
-     'swift-mode:negation-char-face))
-  "Swift mode keywords for Font Lock.")
+     'hylo-mode:negation-char-face))
+  "Hylo mode keywords for Font Lock.")
 
 
-(provide 'swift-mode-font-lock)
+(provide 'hylo-mode-font-lock)
 
-;;; swift-mode-font-lock.el ends here
+;;; hylo-mode-font-lock.el ends here

@@ -281,7 +281,7 @@
          y="1282.5398"
          x="293.1058"
          sodipodi:role="line"
-         id="tspan10169">property: swift-mode:matching-parenthesis</tspan></text>
+         id="tspan10169">property: hylo-mode:matching-parenthesis</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#ff8000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker8131)"
        d="m 317.00005,1221.0397 c -29,53 -62,0 -62,0"
@@ -338,7 +338,7 @@
          sodipodi:role="line"
          id="tspan13911"
          x="172.75865"
-         y="1314.6997">Those properties are put by syntax-propertize-function (swift-mode:syntax-propertize).</tspan></text>
+         y="1314.6997">Those properties are put by syntax-propertize-function (hylo-mode:syntax-propertize).</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:24px;font-family:'DejaVu Sans Mono';-inkscape-font-specification:'DejaVu Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -551,7 +551,7 @@
          sodipodi:role="line"
          x="12.760468"
          y="996.01965"
-         style="line-height:12px;fill:#0080ff;fill-opacity:1">swift-mode:matching-parenthesis</tspan><tspan
+         style="line-height:12px;fill:#0080ff;fill-opacity:1">hylo-mode:matching-parenthesis</tspan><tspan
          sodipodi:role="line"
          x="12.760468"
          y="1008.0197"
@@ -579,7 +579,7 @@
          y="900.01965"
          x="12.760468"
          sodipodi:role="line"
-         id="tspan6012">swift-mode:matching-parenthesis</tspan><tspan
+         id="tspan6012">hylo-mode:matching-parenthesis</tspan><tspan
          style="line-height:12px;fill:#0080ff;fill-opacity:1"
          id="tspan6014"
          y="912.01965"
@@ -612,6 +612,6 @@
          y="1114.6997"
          x="68.690002"
          id="tspan6024"
-         sodipodi:role="line">Those properties are put by syntax-propertize-function (swift-mode:syntax-propertize).</tspan></text>
+         sodipodi:role="line">Those properties are put by syntax-propertize-function (hylo-mode:syntax-propertize).</tspan></text>
   </g>
 </svg>

@@ -1,4 +1,4 @@
-;;; swift-mode-test-fill.el --- Test for swift-mode: filling -*- lexical-binding: t -*-
+;;; hylo-mode-test-fill.el --- Test for hylo-mode: filling -*- lexical-binding: t -*-
 ;; Copyright (C) 2016, 2022 taku0, Josh Caswell
 
 ;; Authors: taku0 (https://github.com/taku0)
@@ -21,64 +21,64 @@
 
 ;;; Commentary:
 
-;; Test for swift-mode: paragraph fill
-;; Execute swift-mode:run-test:fill interactively or in batch mode.
+;; Test for hylo-mode: paragraph fill
+;; Execute hylo-mode:run-test:fill interactively or in batch mode.
 
 ;;; Code:
 
-(require 'swift-mode)
-(require 'swift-mode-test)
-(require 'swift-mode-fill)
+(require 'hylo-mode)
+(require 'hylo-mode-test)
+(require 'hylo-mode-fill)
 (require 'diff)
 
-(defun swift-mode:run-test:fill
+(defun hylo-mode:run-test:fill
     (&optional error-buffer error-counts progress-reporter)
-  "Run paragraph fill tests for `swift-mode'.
+  "Run paragraph fill tests for `hylo-mode'.
 
 ERROR-BUFFER is the buffer to collect errors.  ERROR-COUNTS is an
 association list holding counts of errors, updated destructively.
 PROGRESS-REPORTER is a `progress-reporter' used when the tests are run
 interactively."
   (interactive)
-  (if (not swift-mode:test:running)
-      (swift-mode:run-test '(swift-mode:run-test:fill))
-    (swift-mode:test-fill-region-as-paragraph error-buffer error-counts)
+  (if (not hylo-mode:test:running)
+      (hylo-mode:run-test '(hylo-mode:run-test:fill))
+    (hylo-mode:test-fill-region-as-paragraph error-buffer error-counts)
     (let (lines)
       (setq default-directory
-            (concat (file-name-as-directory swift-mode:test:basedir)
-                    (file-name-as-directory "swift-files")
+            (concat (file-name-as-directory hylo-mode:test:basedir)
+                    (file-name-as-directory "hylo-files")
                     "fill"))
-      (dolist (swift-file (file-expand-wildcards "*.swift"))
+      (dolist (hylo-file (file-expand-wildcards "*.hylo"))
         (redisplay)
         (with-temp-buffer
           (switch-to-buffer (current-buffer))
-          (insert-file-contents-literally swift-file)
+          (insert-file-contents-literally hylo-file)
           (let ((coding-system-for-read 'utf-8))
-            (decode-coding-inserted-region (point-min) (point-max) swift-file))
-          (swift-mode)
+            (decode-coding-inserted-region (point-min) (point-max) hylo-file))
+          (hylo-mode)
           (syntax-propertize (point-max))
-          (setq lines (swift-mode:test-fill:parse-fill-test)))
+          (setq lines (hylo-mode:test-fill:parse-fill-test)))
         (dolist (mode '(break join))
-          (swift-mode:test-fill:test-fill-region
-           swift-file
+          (hylo-mode:test-fill:test-fill-region
+           hylo-file
            lines
            mode
            error-buffer
            error-counts)
-          (swift-mode:test-fill:test-fill-paragraph
-           swift-file
+          (hylo-mode:test-fill:test-fill-paragraph
+           hylo-file
            lines
            mode
            error-buffer
            error-counts
            progress-reporter))))))
 
-(defun swift-mode:test-fill-region-as-paragraph (error-buffer error-counts)
+(defun hylo-mode:test-fill-region-as-paragraph (error-buffer error-counts)
   "Run tests for `fill-region-as-paragraph'.
 
-See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
+See `hylo-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
   ;; Sinle-line comments, insert breaks:
-  (swift-mode:do-test-fill-region-as-paragraph
+  (hylo-mode:do-test-fill-region-as-paragraph
    "// abc def ghi\n"
    "// abc def\n// ghi\n"
    8
@@ -87,7 +87,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
    error-counts)
 
   ;; Sinle-line comments, delete breaks:
-  (swift-mode:do-test-fill-region-as-paragraph
+  (hylo-mode:do-test-fill-region-as-paragraph
    "// abc\n// def\n// ghi\n"
    "// abc def\n// ghi\n"
    8
@@ -96,7 +96,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
    error-counts)
 
   ;; Multiline comments, insert breaks:
-  (swift-mode:do-test-fill-region-as-paragraph
+  (hylo-mode:do-test-fill-region-as-paragraph
    "/* abc def ghi jkl */\n"
    "/*\n abc def ghi\n jkl\n */\n"
    8
@@ -105,7 +105,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
    error-counts)
 
   ;; Multiline comments, delete breaks:
-  (swift-mode:do-test-fill-region-as-paragraph
+  (hylo-mode:do-test-fill-region-as-paragraph
    "/*\n abc\n def\n ghi\n */\n"
    "/*\n abc def ghi\n */\n"
    8
@@ -114,7 +114,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
    error-counts)
 
   ;; Multiline comments, to one-line:
-  (swift-mode:do-test-fill-region-as-paragraph
+  (hylo-mode:do-test-fill-region-as-paragraph
    "/*\n abc\n def\n ghi\n */\n"
    "/* abc def ghi */\n"
    8
@@ -123,7 +123,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
    error-counts)
 
   ;; Multiline comments, keep line break after open delimiter:
-  (swift-mode:do-test-fill-region-as-paragraph
+  (hylo-mode:do-test-fill-region-as-paragraph
    "/*\n abc\n def\n ghi */\n"
    "/*\n abc def ghi */\n"
    8
@@ -132,7 +132,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
    error-counts)
 
   ;; Multiline comments, keep line break before close delimiter:
-  (swift-mode:do-test-fill-region-as-paragraph
+  (hylo-mode:do-test-fill-region-as-paragraph
    "/* abc\n def\n ghi\n */\n"
    "/* abc def\n   ghi\n */\n"
    8
@@ -140,7 +140,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
    error-buffer
    error-counts))
 
-(defun swift-mode:do-test-fill-region-as-paragraph
+(defun hylo-mode:do-test-fill-region-as-paragraph
     (input
      expected
      fill-column-for-test
@@ -156,19 +156,19 @@ EXPECTED is the expected result.
 FILL-COLUMN-FOR-TEST and COMMENT-FILL-COLUMN-FOR-TEST is used for `fill-column'
 and `comment-fill-column' respectively.
 
-See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
+See `hylo-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
   (with-temp-buffer
     (switch-to-buffer (current-buffer))
     (insert input)
-    (swift-mode)
+    (hylo-mode)
     (syntax-propertize (point-max))
     (let ((fill-column fill-column-for-test)
           (comment-fill-column comment-fill-column-for-test))
       (fill-region-as-paragraph (point-min) (point-max)))
     (let* ((status (if (equal (buffer-string) expected)
                        'ok
-                     (swift-mode:show-error
-                      error-buffer "swift-mode-test-fill.el" 0
+                     (hylo-mode:show-error
+                      error-buffer "hylo-mode-test-fill.el" 0
                       "error"
                       (concat "`fill-region-as-paragraph' failed\n"
                               "Expected:\n```\n" expected "```\n\n"
@@ -177,7 +177,7 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
            (count-assoc (assq status error-counts)))
       (setcdr count-assoc (1+ (cdr count-assoc))))))
 
-(defun swift-mode:test-fill:parse-fill-test ()
+(defun hylo-mode:test-fill:parse-fill-test ()
   "Parse the current buffer as a test file and return its structure.
 
 The result is list of elements, which is one of:
@@ -197,19 +197,19 @@ The result is list of elements, which is one of:
       (while (not (eobp))
         (push
          (cond
-          ((looking-at "\\(.*\\)swift-mode:test:paragraph")
+          ((looking-at "\\(.*\\)hylo-mode:test:paragraph")
            (list 'paragraph
                  (match-string-no-properties 1)
                  (cond
-                  ((looking-at ".*swift-mode:test:start-block")
+                  ((looking-at ".*hylo-mode:test:start-block")
                    'start)
-                  ((looking-at ".*swift-mode:test:end-block")
+                  ((looking-at ".*hylo-mode:test:end-block")
                    'end)
                   (t
                    nil))))
-          ((looking-at "\\(.*\\)swift-mode:test:list-item")
+          ((looking-at "\\(.*\\)hylo-mode:test:list-item")
            (list 'list-item (match-string-no-properties 1)))
-          ((looking-at "\\(.*\\)swift-mode:test:heading")
+          ((looking-at "\\(.*\\)hylo-mode:test:heading")
            (list 'heading (match-string-no-properties 1)))
           (t
            (list 'literal
@@ -220,51 +220,51 @@ The result is list of elements, which is one of:
         (forward-line))
       (reverse result))))
 
-(defun swift-mode:test-fill:test-fill-region
+(defun hylo-mode:test-fill:test-fill-region
     (filename lines mode error-buffer error-counts)
   "Run tests for `fill-region'.
 
 FILENAME is the name of test file.
 
 LINES is the parsed lines of the test file.
-See `swift-mode:test-fill:parse-fill-test' for details.
+See `hylo-mode:test-fill:parse-fill-test' for details.
 
 MODE is either `break' or `join'.  If it is `break', test breaking long lines.
 If it is `join' test joining short lines.
 
-See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
+See `hylo-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
   (let (regions
         expected
         actual)
     (with-temp-buffer
       (switch-to-buffer (current-buffer))
-      (swift-mode)
-      (setq regions (nth 0 (swift-mode:test-fill:insert-test lines mode)))
+      (hylo-mode)
+      (setq regions (nth 0 (hylo-mode:test-fill:insert-test lines mode)))
       (syntax-propertize (point-max))
       (dolist (region (reverse regions))
         (fill-region-as-paragraph (nth 0 region) (nth 1 region)))
       (setq expected (buffer-substring-no-properties (point-min) (point-max))))
     (with-temp-buffer
       (switch-to-buffer (current-buffer))
-      (swift-mode)
-      (swift-mode:test-fill:insert-test lines mode)
+      (hylo-mode)
+      (hylo-mode:test-fill:insert-test lines mode)
       (syntax-propertize (point-max))
       (fill-region (point-min) (point-max))
       (setq actual (buffer-substring-no-properties (point-min) (point-max))))
     (let* ((status (if (equal actual expected)
                        'ok
-                     (swift-mode:show-error
+                     (hylo-mode:show-error
                       error-buffer filename 0
                       "error"
                       (concat "`fill-region' failed\n"
-                              (swift-mode:test-fill:diff-strings
+                              (hylo-mode:test-fill:diff-strings
                                expected
                                actual)))
                      'error))
            (count-assoc (assq status error-counts)))
       (setcdr count-assoc (1+ (cdr count-assoc))))))
 
-(defun swift-mode:test-fill:test-fill-paragraph
+(defun hylo-mode:test-fill:test-fill-paragraph
     (filename
      lines
      mode
@@ -276,12 +276,12 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER and ERROR-COUNTS."
 FILENAME is the name of test file.
 
 LINES is the parsed lines of the test file.
-See `swift-mode:test-fill:parse-fill-test' for details.
+See `hylo-mode:test-fill:parse-fill-test' for details.
 
 MODE is either `break' or `join'.  If it is `break', test breaking long lines.
 If it is `join' test joining short lines.
 
-See `swift-mode:run-test:fill' for ERROR-BUFFER, ERROR-COUNTS, and
+See `hylo-mode:run-test:fill' for ERROR-BUFFER, ERROR-COUNTS, and
 PROGRESS-REPORTER."
   (let (regions-and-blocks
         regions
@@ -295,8 +295,8 @@ PROGRESS-REPORTER."
                             end-of-line)))
     (with-temp-buffer
       (switch-to-buffer (current-buffer))
-      (swift-mode)
-      (setq regions-and-blocks (swift-mode:test-fill:insert-test lines mode))
+      (hylo-mode)
+      (setq regions-and-blocks (hylo-mode:test-fill:insert-test lines mode))
       (setq regions (nth 0 regions-and-blocks))
       (setq blocks (nth 1 regions-and-blocks))
       (setq original (buffer-string))
@@ -309,7 +309,7 @@ PROGRESS-REPORTER."
         (dolist (point-placement point-placements)
           (when (not noninteractive)
             (progress-reporter-update progress-reporter))
-          (swift-mode:test-fill:do-test-fill-paragraph
+          (hylo-mode:test-fill:do-test-fill-paragraph
            filename
            original
            expected
@@ -328,7 +328,7 @@ PROGRESS-REPORTER."
         (dolist (point-placement point-placements)
           (when (not noninteractive)
             (progress-reporter-update progress-reporter))
-          (swift-mode:test-fill:do-test-fill-paragraph
+          (hylo-mode:test-fill:do-test-fill-paragraph
            filename
            original
            expected
@@ -339,7 +339,7 @@ PROGRESS-REPORTER."
            error-buffer
            error-counts))))))
 
-(defun swift-mode:test-fill:do-test-fill-paragraph (filename
+(defun hylo-mode:test-fill:do-test-fill-paragraph (filename
                                                     original
                                                     expected
                                                     region
@@ -370,9 +370,9 @@ one of the following:
 MODE is either `break' or `join'.  If it is `break', test breaking long lines.
 If it is `join' test joining short lines.
 
-ENTIRE-COMMENT is used for `swift-mode:fill-paragraph-entire-comment-or-string'.
+ENTIRE-COMMENT is used for `hylo-mode:fill-paragraph-entire-comment-or-string'.
 
-See `swift-mode:run-test:fill' for ERROR-BUFFER, ERROR-COUNTS."
+See `hylo-mode:run-test:fill' for ERROR-BUFFER, ERROR-COUNTS."
   (let (actual)
     (delete-region (point-min) (point-max))
     (insert original)
@@ -397,31 +397,31 @@ See `swift-mode:run-test:fill' for ERROR-BUFFER, ERROR-COUNTS."
       (end-of-line))
      ((eq point-placement 'end-of-region)
       (goto-char (1- (nth 1 region)))))
-    (let ((swift-mode:fill-paragraph-entire-comment-or-string entire-comment))
+    (let ((hylo-mode:fill-paragraph-entire-comment-or-string entire-comment))
       (fill-paragraph))
     (setq actual (buffer-substring-no-properties (point-min) (point-max)))
     (let* ((status
             (if (equal actual expected)
                 'ok
-              (swift-mode:show-error
+              (hylo-mode:show-error
                error-buffer filename (nth 2 region)
                "error"
                (concat "`fill-paragraph' failed\n"
                        "point-placement: " (symbol-name point-placement) "\n"
                        "mode: " (prin1-to-string mode) "\n"
                        "entire-comment: " (prin1-to-string entire-comment) "\n"
-                       (swift-mode:test-fill:diff-strings
+                       (hylo-mode:test-fill:diff-strings
                         expected
                         actual)))
               'error))
            (count-assoc (assq status error-counts)))
       (setcdr count-assoc (1+ (cdr count-assoc))))))
 
-(defun swift-mode:test-fill:insert-test (lines mode)
+(defun hylo-mode:test-fill:insert-test (lines mode)
   "Insert parsed lines at point.
 
 LINES is the parsed lines of the test file.
-See `swift-mode:test-fill:parse-fill-test' for details.
+See `hylo-mode:test-fill:parse-fill-test' for details.
 
 MODE is either `break' or `join'.  If it is `break', test breaking long lines.
 If it is `join' test joining short lines."
@@ -439,7 +439,7 @@ If it is `join' test joining short lines."
         (setq start (point))
         (when (eq (nth 2 line) 'start)
           (setq block-start (point)))
-        (swift-mode:test-fill:insert-paragraph
+        (hylo-mode:test-fill:insert-paragraph
          (nth 1 line)
          (nth 1 line)
          mode)
@@ -448,21 +448,21 @@ If it is `join' test joining short lines."
           (push (list block-start (point) line-number) blocks)))
        ((eq (car line) 'list-item)
         (setq start (point))
-        (swift-mode:test-fill:insert-paragraph
+        (hylo-mode:test-fill:insert-paragraph
          (concat (nth 1 line) "- ")
          (nth 1 line)
          mode)
         (push (list start (point) line-number) regions))
        ((eq (car line) 'heading)
         (setq start (point))
-        (swift-mode:test-fill:insert-paragraph
+        (hylo-mode:test-fill:insert-paragraph
          (concat (nth 1 line) "## ")
          (nth 1 line)
          mode)
         (push (list start (point) line-number) regions))))
     (list (reverse regions) (reverse blocks))))
 
-(defun swift-mode:test-fill:insert-paragraph (first-line-prefix prefix mode)
+(defun hylo-mode:test-fill:insert-paragraph (first-line-prefix prefix mode)
   "Insert a test paragraph at point.
 
 FIRST-LINE-PREFIX is inserted before the first line, while PREFIX is inserted
@@ -481,7 +481,7 @@ long line."
       (insert "aaa "))
     (insert "\n"))))
 
-(defun swift-mode:test-fill:diff-strings (expected actual)
+(defun hylo-mode:test-fill:diff-strings (expected actual)
   "Return difference of EXPECTED and ACTUAL."
   (let (expected-buffer actual-buffer)
     (with-temp-buffer
@@ -496,6 +496,6 @@ long line."
           (diff-no-select expected-buffer actual-buffer nil t (current-buffer))
           (buffer-string))))))
 
-(provide 'swift-mode-test-fill)
+(provide 'hylo-mode-test-fill)
 
-;;; swift-mode-test-fill.el ends here
+;;; hylo-mode-test-fill.el ends here

@@ -1,4 +1,4 @@
-;;; swift-mode-test-indent.el --- Test for swift-mode: indentation  -*- lexical-binding: t -*-
+;;; hylo-mode-test-indent.el --- Test for hylo-mode: indentation  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2016-2018 taku0
 
@@ -21,18 +21,18 @@
 
 ;;; Commentary:
 
-;; Test for swift-mode: indentation.
-;; Execute swift-mode:run-test:indent interactively or in batch mode.
+;; Test for hylo-mode: indentation.
+;; Execute hylo-mode:run-test:indent interactively or in batch mode.
 
 ;;; Code:
 
-(require 'swift-mode)
-(require 'swift-mode-test)
-(require 'swift-mode-indent)
+(require 'hylo-mode)
+(require 'hylo-mode-test)
+(require 'hylo-mode-indent)
 
-(defun swift-mode:run-test:indent
+(defun hylo-mode:run-test:indent
     (&optional error-buffer error-counts progress-reporter)
-  "Run indentation test for `swift-mode'.
+  "Run indentation test for `hylo-mode'.
 
 ERROR-BUFFER is the buffer to output errors.
 ERROR-COUNTS is a association list holding counts of errors. Updated
@@ -40,27 +40,27 @@ destructively.
 PROGRESS-REPORTER is the progress-reporter."
   (interactive)
 
-  (if (not swift-mode:test:running)
-      (swift-mode:run-test '(swift-mode:run-test:indent))
+  (if (not hylo-mode:test:running)
+      (hylo-mode:run-test '(hylo-mode:run-test:indent))
     (let ((current-line 0))
       (setq default-directory
-            (concat (file-name-as-directory swift-mode:test:basedir)
-                    (file-name-as-directory "swift-files")
+            (concat (file-name-as-directory hylo-mode:test:basedir)
+                    (file-name-as-directory "hylo-files")
                     "indent"))
 
-      (dolist (swift-file (file-expand-wildcards "*.swift"))
+      (dolist (hylo-file (file-expand-wildcards "*.hylo"))
         (redisplay)
         (with-temp-buffer
           (switch-to-buffer (current-buffer))
-          (insert-file-contents-literally swift-file)
-          (swift-mode)
+          (insert-file-contents-literally hylo-file)
+          (hylo-mode)
           (setq current-line 0)
           (while (not (eobp))
             (when (not noninteractive)
               (progress-reporter-update progress-reporter))
             (setq current-line (1+ current-line))
             (cond
-             ((looking-at ".*//.*swift-mode:test:keep-indent")
+             ((looking-at ".*//.*hylo-mode:test:keep-indent")
               nil)
 
              ((= (line-beginning-position) (line-end-position))
@@ -68,32 +68,32 @@ PROGRESS-REPORTER is the progress-reporter."
               nil)
 
              (t
-              (when (looking-at ".*//.*swift-mode:test:eval\\(.*\\)")
+              (when (looking-at ".*//.*hylo-mode:test:eval\\(.*\\)")
                 (eval-region (match-beginning 1) (match-end 1)))
               (let*
-                  ((status (swift-mode:test-current-line-indent
-                            swift-file current-line error-buffer))
+                  ((status (hylo-mode:test-current-line-indent
+                            hylo-file current-line error-buffer))
                    (count-assoc (assq status error-counts)))
                 (setcdr count-assoc (1+ (cdr count-assoc))))))
             (forward-line)))))))
 
-(defun swift-mode:test-current-line-indent
-    (swift-file current-line error-buffer)
-  "Run indentation test for swift-mode on current line.
+(defun hylo-mode:test-current-line-indent
+    (hylo-file current-line error-buffer)
+  "Run indentation test for hylo-mode on current line.
 
-SWIFT-FILE is the filename of the current test case.
+HYLO-FILE is the filename of the current test case.
 CURRENT-LINE is the current line number.
 ERROR-BUFFER is the buffer to output errors."
   (back-to-indentation)
   (let ((original-indent (current-column))
         computed-indent
-        (known-bug (looking-at ".*//.*swift-mode:test:known-bug"))
+        (known-bug (looking-at ".*//.*hylo-mode:test:known-bug"))
         (status 'ok))
     (delete-horizontal-space)
     (when (= original-indent 0)
       (indent-line-to 1))
 
-    (swift-mode:indent-line)
+    (hylo-mode:indent-line)
     (back-to-indentation)
     (setq computed-indent (current-column))
     (indent-line-to original-indent)
@@ -101,8 +101,8 @@ ERROR-BUFFER is the buffer to output errors."
     (when (/= original-indent computed-indent)
       (setq status (if known-bug 'warning 'error))
 
-      (swift-mode:show-error
-       error-buffer swift-file current-line
+      (hylo-mode:show-error
+       error-buffer hylo-file current-line
        (if known-bug "warning" "error")
        (concat
         (if known-bug "(known bug) " "")
@@ -113,13 +113,13 @@ ERROR-BUFFER is the buffer to output errors."
 
     (when (and (= original-indent computed-indent) known-bug)
       (setq status 'info)
-      (swift-mode:show-error
-       error-buffer swift-file current-line
+      (hylo-mode:show-error
+       error-buffer hylo-file current-line
        "info"
        "known-bug is fixed somehow"))
 
     status))
 
-(provide 'swift-mode-test-indent)
+(provide 'hylo-mode-test-indent)
 
-;;; swift-mode-test-indent.el ends here
+;;; hylo-mode-test-indent.el ends here

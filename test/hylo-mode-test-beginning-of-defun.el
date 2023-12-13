@@ -1,4 +1,4 @@
-;;; swift-mode-test-beginning-of-defun.el --- Test for swift-mode: beginning-of-defun -*- lexical-binding: t -*-
+;;; hylo-mode-test-beginning-of-defun.el --- Test for hylo-mode: beginning-of-defun -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2017-2019 taku0
 
@@ -21,45 +21,45 @@
 
 ;;; Commentary:
 
-;; Test for swift-mode: beginning-of-defun.
-;; Execute swift-mode:run-test:beginning-of-defun interactively or in batch
+;; Test for hylo-mode: beginning-of-defun.
+;; Execute hylo-mode:run-test:beginning-of-defun interactively or in batch
 ;; mode.
 
 ;;; Code:
 
-(require 'swift-mode)
-(require 'swift-mode-test)
-(require 'swift-mode-beginning-of-defun)
+(require 'hylo-mode)
+(require 'hylo-mode-test)
+(require 'hylo-mode-beginning-of-defun)
 (require 'seq)
 
-(defun swift-mode:run-test:beginning-of-defun
+(defun hylo-mode:run-test:beginning-of-defun
     (&optional error-buffer error-counts progress-reporter)
-  "Run `beginning-of-defun' test for `swift-mode'.
+  "Run `beginning-of-defun' test for `hylo-mode'.
 
 ERROR-BUFFER is the buffer to output errors.
 ERROR-COUNTS is a association list holding counts of errors.  Updated
 destructively.
 PROGRESS-REPORTER is the progress-reporter."
   (interactive)
-  (if (not swift-mode:test:running)
-      (swift-mode:run-test '(swift-mode:run-test:beginning-of-defun))
+  (if (not hylo-mode:test:running)
+      (hylo-mode:run-test '(hylo-mode:run-test:beginning-of-defun))
     (let ((current-line 0)
           expected-positions
           expected-positions-desc
           expected-positions-asc
           test-parameters)
       (setq default-directory
-            (concat (file-name-as-directory swift-mode:test:basedir)
-                    (file-name-as-directory "swift-files")
+            (concat (file-name-as-directory hylo-mode:test:basedir)
+                    (file-name-as-directory "hylo-files")
                     "beginning-of-defun"))
-      (dolist (swift-file (file-expand-wildcards "*.swift"))
+      (dolist (hylo-file (file-expand-wildcards "*.hylo"))
         (redisplay)
         (with-temp-buffer
           (switch-to-buffer (current-buffer))
-          (insert-file-contents-literally swift-file)
-          (swift-mode)
+          (insert-file-contents-literally hylo-file)
+          (hylo-mode)
           (setq expected-positions
-                (swift-mode:parse-beginning-of-defun-test-file))
+                (hylo-mode:parse-beginning-of-defun-test-file))
           (setq expected-positions-desc
                 (mapcar (lambda (p)
                           (list
@@ -80,38 +80,38 @@ PROGRESS-REPORTER is the progress-reporter."
                   expected-positions-desc
                   #'<
                   (lambda ()
-                    (swift-mode:beginning-of-defun)
+                    (hylo-mode:beginning-of-defun)
                     (skip-syntax-forward " "))
                   'beginning-of-defun)
                  (list
                   expected-positions-asc
                   #'>
-                  #'swift-mode:end-of-defun
+                  #'hylo-mode:end-of-defun
                   'end-of-defun)
                  (list
                   expected-positions-desc
                   #'<
                   (lambda ()
-                    (swift-mode:backward-sentence)
+                    (hylo-mode:backward-sentence)
                     (skip-syntax-forward " "))
                   '(beginning-of-sentence beginning-of-defun))
                  (list
                   expected-positions-asc
                   #'>
-                  #'swift-mode:forward-sentence
+                  #'hylo-mode:forward-sentence
                   '(end-of-sentence end-of-defun))))
           (setq current-line 0)
           (while (not (eobp))
             (when (not noninteractive)
               (progress-reporter-update progress-reporter))
             (setq current-line (1+ current-line))
-            (when (looking-at ".*//.*swift-mode:test:eval\\(.*\\)")
+            (when (looking-at ".*//.*hylo-mode:test:eval\\(.*\\)")
               (eval-region (match-beginning 1) (match-end 1)))
 
             (dolist (test-parameter test-parameters)
               (let* ((status (apply
-                              #'swift-mode:test-current-line-beginning-of-defun
-                              swift-file
+                              #'hylo-mode:test-current-line-beginning-of-defun
+                              hylo-file
                               current-line
                               error-buffer
                               test-parameter))
@@ -119,7 +119,7 @@ PROGRESS-REPORTER is the progress-reporter."
                 (setcdr count-assoc (1+ (cdr count-assoc)))))
             (forward-line)))))))
 
-(defun swift-mode:parse-beginning-of-defun-test-file ()
+(defun hylo-mode:parse-beginning-of-defun-test-file ()
   "Parse the current buffer as a test file and return its structure.
 
 The result is a list of remarkable tokens in descendant order.  A remarkable
@@ -184,24 +184,24 @@ respectively, in the test file, and removed from the buffer.
                 expected-positions)
           (replace-match ""))
          ((and (member match-string '("{" "[" "(" "/*"))
-               (not (swift-mode:chunk-after match-beginning)))
+               (not (hylo-mode:chunk-after match-beginning)))
           (setq depth (1+ depth))
           (push (list '{ match-beginning match-end (1- depth) depth)
                 expected-positions))
          ((and (member match-string '("}" "]" ")" "*/"))
-               (not (swift-mode:chunk-after match-end)))
+               (not (hylo-mode:chunk-after match-end)))
           (setq depth (1- depth))
           (push (list '} match-beginning match-end (1+ depth) depth)
                 expected-positions))
 
          ((and (equal match-string "//")
-               (not (swift-mode:chunk-after match-beginning)))
+               (not (hylo-mode:chunk-after match-beginning)))
           (setq depth (1+ depth))
           (push (list '{ match-beginning match-end (1- depth) depth)
                 expected-positions))
          ((and (equal match-string "\n")
-               (eq (swift-mode:chunk:type
-                    (swift-mode:chunk-after match-beginning))
+               (eq (hylo-mode:chunk:type
+                    (hylo-mode:chunk-after match-beginning))
                    'single-line-comment))
           (if (looking-at "\\s *//")
               ;; Fuses with next line.
@@ -211,10 +211,10 @@ respectively, in the test file, and removed from the buffer.
                   expected-positions)))
          ((and (equal match-string "\"\"\"")
                (not (eq (char-before match-beginning) ?\\))
-               (not (swift-mode:chunk:comment-p
-                     (swift-mode:chunk-after match-beginning))))
-          (if (swift-mode:chunk:multiline-string-p
-               (swift-mode:chunk-after match-end))
+               (not (hylo-mode:chunk:comment-p
+                     (hylo-mode:chunk-after match-beginning))))
+          (if (hylo-mode:chunk:multiline-string-p
+               (hylo-mode:chunk-after match-end))
               (progn (setq depth (1+ depth))
                      (push (list '{ match-beginning match-end (1- depth) depth)
                            expected-positions))
@@ -223,12 +223,12 @@ respectively, in the test file, and removed from the buffer.
                   expected-positions)))
          ((and (equal match-string "\"")
                (not (eq (char-before match-beginning) ?\\))
-               (not (swift-mode:chunk:comment-p
-                     (swift-mode:chunk-after match-beginning)))
-               (not (swift-mode:chunk:multiline-string-p
-                     (swift-mode:chunk-after match-beginning))))
-          (if (swift-mode:chunk:single-line-string-p
-               (swift-mode:chunk-after match-end))
+               (not (hylo-mode:chunk:comment-p
+                     (hylo-mode:chunk-after match-beginning)))
+               (not (hylo-mode:chunk:multiline-string-p
+                     (hylo-mode:chunk-after match-beginning))))
+          (if (hylo-mode:chunk:single-line-string-p
+               (hylo-mode:chunk-after match-end))
               (progn (setq depth (1+ depth))
                      (push (list '{ match-beginning match-end (1- depth) depth)
                            expected-positions))
@@ -240,21 +240,21 @@ respectively, in the test file, and removed from the buffer.
             expected-positions)
       expected-positions)))
 
-(defun swift-mode:test-current-line-beginning-of-defun
-    (swift-file
+(defun hylo-mode:test-current-line-beginning-of-defun
+    (hylo-file
      current-line
      error-buffer
      expected-positions
      less-than-function
      beginning-of-thing-function
      boundary-symbols)
-  "Run `beginning-of-defun' test for `swift-mode' on current line.
+  "Run `beginning-of-defun' test for `hylo-mode' on current line.
 
-SWIFT-FILE is the filename of the current test case.
+HYLO-FILE is the filename of the current test case.
 CURRENT-LINE is the current line number.
 ERROR-BUFFER is the buffer to output errors.
 EXPECTED-POSITIONS is a list of remarkable tokens
-\(see `swift-mode:parse-beginning-of-defun-test-file').
+\(see `hylo-mode:parse-beginning-of-defun-test-file').
 LESS-THAN-FUNCTION is a function returns non-nil iff the firt argument is
 before (or after for `end-of-defun' test) the second argument.
 BEGINNING-OF-THING-FUNCTION is a function goes to the boundary, that is the
@@ -291,8 +291,8 @@ like `beginning-of-defun' or `end-of-defun'"
                               (point)))
       (when (/= expected-position actual-position)
         (setq status 'error)
-        (swift-mode:show-error
-         error-buffer swift-file current-line
+        (hylo-mode:show-error
+         error-buffer hylo-file current-line
          "error"
          (concat
           (symbol-name (car boundary-symbols))
@@ -309,6 +309,6 @@ like `beginning-of-defun' or `end-of-defun'"
       (setq status 'ok))
     status))
 
-(provide 'swift-mode-test-beginning-of-defun)
+(provide 'hylo-mode-test-beginning-of-defun)
 
-;;; swift-mode-test-beginning-of-defun.el ends here
+;;; hylo-mode-test-beginning-of-defun.el ends here

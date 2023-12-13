@@ -1,4 +1,4 @@
-;;; swift-mode-test-font-lock.el --- Test for swift-mode: font-lock  -*- lexical-binding: t -*-
+;;; hylo-mode-test-font-lock.el --- Test for hylo-mode: font-lock  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2020 Daniel Martín
 
@@ -21,38 +21,38 @@
 
 ;;; Commentary:
 
-;; Test for swift-mode: font-lock.
-;; Execute swift-mode:run-test:font-lock interactively or in batch mode.
+;; Test for hylo-mode: font-lock.
+;; Execute hylo-mode:run-test:font-lock interactively or in batch mode.
 
 ;;; Code:
 
-(require 'swift-mode)
-(require 'swift-mode-test)
-(require 'swift-mode-font-lock)
+(require 'hylo-mode)
+(require 'hylo-mode-test)
+(require 'hylo-mode-font-lock)
 
-(defun swift-mode:run-test:font-lock
+(defun hylo-mode:run-test:font-lock
     (&optional error-buffer error-counts progress-reporter)
-  "Run font-lock test for `swift-mode'.
+  "Run font-lock test for `hylo-mode'.
 
 ERROR-BUFFER is the buffer to output errors.
 ERROR-COUNTS is a association list holding counts of errors.  Updated
 destructively.
 PROGRESS-REPORTER is the progress-reporter."
   (interactive)
-  (if (not swift-mode:test:running)
-      (swift-mode:run-test '(swift-mode:run-test:font-lock))
+  (if (not hylo-mode:test:running)
+      (hylo-mode:run-test '(hylo-mode:run-test:font-lock))
     (let ((current-line 0))
       (setq default-directory
-            (concat (file-name-as-directory swift-mode:test:basedir)
-                    (file-name-as-directory "swift-files")
+            (concat (file-name-as-directory hylo-mode:test:basedir)
+                    (file-name-as-directory "hylo-files")
                     "font-lock"))
 
-      (dolist (swift-file (file-expand-wildcards "*.swift"))
+      (dolist (hylo-file (file-expand-wildcards "*.hylo"))
         (redisplay)
         (with-temp-buffer
           (switch-to-buffer (current-buffer))
-          (insert-file-contents-literally swift-file)
-          (swift-mode)
+          (insert-file-contents-literally hylo-file)
+          (hylo-mode)
           (funcall (if (fboundp 'font-lock-ensure)
                        #'font-lock-ensure
                      #'font-lock-fontify-buffer))
@@ -70,17 +70,17 @@ PROGRESS-REPORTER is the progress-reporter."
               nil)
              (t
               (let*
-                  ((status (swift-mode:test-current-line-font-lock
-                            swift-file current-line error-buffer))
+                  ((status (hylo-mode:test-current-line-font-lock
+                            hylo-file current-line error-buffer))
                    (count-assoc (assq status error-counts)))
                 (setcdr count-assoc (1+ (cdr count-assoc))))))
             (forward-line)))))))
 
-(defun swift-mode:test-current-line-font-lock
-    (swift-file current-line error-buffer)
-  "Compute the font-lock properties applied by swift-mode on current line.
+(defun hylo-mode:test-current-line-font-lock
+    (hylo-file current-line error-buffer)
+  "Compute the font-lock properties applied by hylo-mode on current line.
 
-SWIFT-FILE is the filename of the current test case.
+HYLO-FILE is the filename of the current test case.
 CURRENT-LINE is the current line number.
 ERROR-BUFFER is the buffer to output errors."
   (let ((status 'ok))
@@ -90,8 +90,8 @@ ERROR-BUFFER is the buffer to output errors."
                                                             (match-end 2))))
         (when (not (string-equal expected-props actual-props))
           (setq status 'error)
-          (swift-mode:show-error
-           error-buffer swift-file current-line
+          (hylo-mode:show-error
+           error-buffer hylo-file current-line
            "error"
            (concat
             "font-lock: expected "
@@ -100,6 +100,6 @@ ERROR-BUFFER is the buffer to output errors."
             (prin1-to-string actual-props))))))
     status))
 
-(provide 'swift-mode-test-font-lock)
+(provide 'hylo-mode-test-font-lock)
 
-;;; swift-mode-test-font-lock.el ends here
+;;; hylo-mode-test-font-lock.el ends here

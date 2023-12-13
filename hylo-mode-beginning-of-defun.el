@@ -1,4 +1,4 @@
-;;; swift-mode-beginning-of-defun.el --- Major-mode for Apple's Swift programming language, beginning/end-of-defun. -*- lexical-binding: t -*-
+;;; hylo-mode-beginning-of-defun.el --- Major-mode for the Hylo programming language, beginning/end-of-defun. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014-2021 taku0
 
@@ -28,21 +28,21 @@
 ;;
 ;; A defun include modifiers, attributes, and comments on the same line.
 ;;
-;; `swift-mode:beginning-of-defun' moves the point to the beginning of a defun
+;; `hylo-mode:beginning-of-defun' moves the point to the beginning of a defun
 ;; that precedes (if the arg is positive) or follows (if the arg is negative)
 ;; the original point and has the same or less nesting level.
 ;;
-;; `swift-mode:end-of-defun' moves the point to the end of a defun
+;; `hylo-mode:end-of-defun' moves the point to the end of a defun
 ;; that follows (if the arg is positive) or precedes (if the arg is negative)
 ;; the original point and has the same or less nesting level.
 
 ;;; Code:
 
-(require 'swift-mode-lexer)
-(require 'swift-mode-indent)
+(require 'hylo-mode-lexer)
+(require 'hylo-mode-indent)
 
-(defcustom swift-mode:mark-defun-preference 'containing
-  "Preference for `swift-mode:mark-defun' for nested declarations.
+(defcustom hylo-mode:mark-defun-preference 'containing
+  "Preference for `hylo-mode:mark-defun' for nested declarations.
 
 Suppose the following code with the point located at A:
 
@@ -56,19 +56,19 @@ Suppose the following code with the point located at A:
       }
     }
 
-If `swift-mode:mark-defun-preference' is `containing', `swift-mode:mark-defun'
+If `hylo-mode:mark-defun-preference' is `containing', `hylo-mode:mark-defun'
 marks the `outer' function.  Likewise, it marks `inner1' if the preference is
 `preceding' and `inner2' if the preference is `following'."
   :type '(choice (const :tag "Containing" containing)
                  (const :tag "Preceding" preceding)
                  (const :tag "Following" following))
-  :group 'swift
+  :group 'hylo
   :safe #'symbolp)
 
-(defvar swift-mode:last-mark-direction 'containing
-  "Last direction of `swift-mode:mark-generic-block'.")
+(defvar hylo-mode:last-mark-direction 'containing
+  "Last direction of `hylo-mode:mark-generic-block'.")
 
-(defun swift-mode:beginning-of-defun (&optional arg)
+(defun hylo-mode:beginning-of-defun (&optional arg)
   "Move backward to the beginning of a defun.
 
 See `beginning-of-defun' for ARG.
@@ -85,87 +85,87 @@ and the region is not active."
         ;; Moving backward
         (while (and result (< 0 arg))
           (let ((last-position (point)))
-            (setq result (swift-mode:beginning-of-defun-backward))
+            (setq result (hylo-mode:beginning-of-defun-backward))
             (when (< (point) last-position)
               (setq arg (1- arg)))
             (when (and (< 0 arg)
                        (eq 'outside-of-buffer
-                           (swift-mode:token:type
-                            (swift-mode:backward-token-or-list))))
+                           (hylo-mode:token:type
+                            (hylo-mode:backward-token-or-list))))
               (setq result nil))))
       ;; Moving forward
-      (setq result (swift-mode:beginning-of-defun-forward))
+      (setq result (hylo-mode:beginning-of-defun-forward))
       (when (and result (< pos (point)))
         (setq arg (1+ arg)))
       (while (and result (< arg 0))
-        (swift-mode:forward-statement)
+        (hylo-mode:forward-statement)
         (forward-comment (point-max))
-        (setq result (swift-mode:beginning-of-defun-forward))
+        (setq result (hylo-mode:beginning-of-defun-forward))
         (setq arg (1+ arg))))
     (and result
-         (eq this-command 'swift-mode:beginning-of-defun)
-         (not (eq last-command 'swift-mode:beginning-of-defun))
+         (eq this-command 'hylo-mode:beginning-of-defun)
+         (not (eq last-command 'hylo-mode:beginning-of-defun))
          (not (region-active-p))
          (push-mark pos))
     result))
 
-(defun swift-mode:beginning-of-defun-backward ()
+(defun hylo-mode:beginning-of-defun-backward ()
   "Goto the beginning of a defun at or before the cursor."
   (let ((keyword-token nil))
     (while (null keyword-token)
-      (swift-mode:beginning-of-statement)
-      (setq keyword-token (swift-mode:find-defun-keyword))
+      (hylo-mode:beginning-of-statement)
+      (setq keyword-token (hylo-mode:find-defun-keyword))
       (unless keyword-token
-        (let ((previous-token (swift-mode:backward-token-or-list)))
-          (when (eq (swift-mode:token:type previous-token) 'outside-of-buffer)
+        (let ((previous-token (hylo-mode:backward-token-or-list)))
+          (when (eq (hylo-mode:token:type previous-token) 'outside-of-buffer)
             (setq keyword-token previous-token)))))
-    (not (eq (swift-mode:token:type keyword-token) 'outside-of-buffer))))
+    (not (eq (hylo-mode:token:type keyword-token) 'outside-of-buffer))))
 
-(defun swift-mode:beginning-of-defun-forward ()
+(defun hylo-mode:beginning-of-defun-forward ()
   "Goto the beginning of a defun at or after the cursor.
 
 If the cursor is not at the beginning of a statement, the cursor may go back to
 the beginning of the current statement."
   (let ((keyword-token nil))
     (while (null keyword-token)
-      (setq keyword-token (swift-mode:find-defun-keyword))
+      (setq keyword-token (hylo-mode:find-defun-keyword))
       (if keyword-token
           (progn
-            (goto-char (swift-mode:token:start keyword-token))
-            (swift-mode:beginning-of-statement))
-        (let ((last-token (swift-mode:forward-statement)))
-          (when (eq (swift-mode:token:type last-token) 'outside-of-buffer)
+            (goto-char (hylo-mode:token:start keyword-token))
+            (hylo-mode:beginning-of-statement))
+        (let ((last-token (hylo-mode:forward-statement)))
+          (when (eq (hylo-mode:token:type last-token) 'outside-of-buffer)
             (setq keyword-token last-token))
           (forward-comment (point-max)))))
-    (not (eq (swift-mode:token:type keyword-token) 'outside-of-buffer))))
+    (not (eq (hylo-mode:token:type keyword-token) 'outside-of-buffer))))
 
-(defun swift-mode:find-defun-keyword ()
+(defun hylo-mode:find-defun-keyword ()
   "Find a defun keyword token in the current statement.
 
 If a keyword found in the current statement, return the token.
 Otherwise, return nil.
 The cursor must be at the beginning of a statement."
   (save-excursion
-    (let ((token (swift-mode:find-defun-keyword-simple)))
+    (let ((token (hylo-mode:find-defun-keyword-simple)))
       (cond
-       ((member (swift-mode:token:text token) '("var" "let"))
-        (when (swift-mode:class-like-member-p) token))
-       ((equal (swift-mode:token:text token) "case")
-        (swift-mode:backward-sexps-until-open-curly-bracket)
-        (swift-mode:beginning-of-statement)
-        (let ((parent-token (swift-mode:find-defun-keyword-simple)))
-          (when (equal (swift-mode:token:text parent-token) "enum")
+       ((member (hylo-mode:token:text token) '("var" "let"))
+        (when (hylo-mode:class-like-member-p) token))
+       ((equal (hylo-mode:token:text token) "case")
+        (hylo-mode:backward-sexps-until-open-curly-bracket)
+        (hylo-mode:beginning-of-statement)
+        (let ((parent-token (hylo-mode:find-defun-keyword-simple)))
+          (when (equal (hylo-mode:token:text parent-token) "enum")
             token)))
        (t token)))))
 
-(defun swift-mode:find-defun-keyword-simple ()
+(defun hylo-mode:find-defun-keyword-simple ()
   "Find a defun keyword token in the current statement.
 
 If a keyword found in the current statement, return the token.
 Return the token for local variable declarations as well.
 Otherwise, return nil.
 The cursor must be at the beginning of a statement."
-  (let ((token (swift-mode:forward-token-or-list))
+  (let ((token (hylo-mode:forward-token-or-list))
         (defun-keywords
          '("import" "typealias" "associatedtype"
            "enum" "struct" "actor" "protocol" "extension"
@@ -178,8 +178,8 @@ The cursor must be at the beginning of a statement."
                        anonymous-function-parameter-in outside-of-buffer))
         (class-token nil))
     (while (not (or
-                 (memq (swift-mode:token:type token) stop-tokens)
-                 (member (swift-mode:token:text token) defun-keywords)))
+                 (memq (hylo-mode:token:type token) stop-tokens)
+                 (member (hylo-mode:token:text token) defun-keywords)))
       ;; "class" token may be either a class declaration keyword or a modifier:
       ;;
       ;; // Nested class named "final"
@@ -190,46 +190,46 @@ The cursor must be at the beginning of a statement."
       ;;
       ;; Keeps scanning and returns the token if there are no other
       ;; `defun-keywords'.
-      (when (equal (swift-mode:token:text token) "class")
+      (when (equal (hylo-mode:token:text token) "class")
         (setq class-token token))
-      (setq token (swift-mode:forward-token-or-list)))
-    (if (member (swift-mode:token:text token) defun-keywords)
+      (setq token (hylo-mode:forward-token-or-list)))
+    (if (member (hylo-mode:token:text token) defun-keywords)
         token
       class-token)))
 
-(defun swift-mode:class-like-member-p ()
+(defun hylo-mode:class-like-member-p ()
   "Return t if the cursor is on a member of a class-like declaration.
 Also return t if the cursor is on a global declaration.
 Return nil otherwise."
   (or
-   (let ((parent (swift-mode:backward-sexps-until-open-curly-bracket)))
-     (eq (swift-mode:token:type parent) 'outside-of-buffer))
+   (let ((parent (hylo-mode:backward-sexps-until-open-curly-bracket)))
+     (eq (hylo-mode:token:type parent) 'outside-of-buffer))
    (progn
-     (swift-mode:beginning-of-statement)
+     (hylo-mode:beginning-of-statement)
      (member
-      (swift-mode:token:text (swift-mode:find-defun-keyword-simple))
+      (hylo-mode:token:text (hylo-mode:find-defun-keyword-simple))
       '("enum" "struct" "actor" "class" "protocol" "extension")))))
 
-(defun swift-mode:beginning-of-statement ()
+(defun hylo-mode:beginning-of-statement ()
   "Move backward to the beginning of a statement.
 Statements include comments on the same line.
 
 When called at the beginning of a statement, keep the position.
 
 Intended for internal use."
-  (let ((chunk (swift-mode:chunk-after)))
+  (let ((chunk (hylo-mode:chunk-after)))
     (when chunk
-      (goto-char (swift-mode:chunk:start chunk))))
+      (goto-char (hylo-mode:chunk:start chunk))))
   (when (and (eq (char-syntax (or (char-after) ?.)) ?w)
              (eq (char-syntax (or (char-before) ?.)) ?w))
-    (swift-mode:forward-token))
+    (hylo-mode:forward-token))
   (let ((pos (point))
         (previous-token (save-excursion
                           (forward-comment (- (point)))
-                          (swift-mode:backward-token))))
+                          (hylo-mode:backward-token))))
     (forward-comment (point-max))
-    (swift-mode:goto-non-comment-bol)
-    (swift-mode:skip-whitespaces)
+    (hylo-mode:goto-non-comment-bol)
+    (hylo-mode:skip-whitespaces)
 
     ;; We have three cases:
     ;;
@@ -242,156 +242,156 @@ Intended for internal use."
     ;; }
     (cond
      ((or (< pos (point))
-          (memq (swift-mode:token:type
-                 (save-excursion (swift-mode:forward-token)))
+          (memq (hylo-mode:token:type
+                 (save-excursion (hylo-mode:forward-token)))
                 '(} \) \])))
       ;; The pos is at A or just before closing parens.
-      (if (memq (swift-mode:token:type previous-token)
-                swift-mode:statement-parent-tokens)
+      (if (memq (hylo-mode:token:type previous-token)
+                hylo-mode:statement-parent-tokens)
           ;; At beginning of a block. Goes up.
-          (goto-char (swift-mode:token:start previous-token))
+          (goto-char (hylo-mode:token:start previous-token))
         ;; Otherwise, skips implicit semicolons.
-        (goto-char (swift-mode:token:end previous-token)))
+        (goto-char (hylo-mode:token:end previous-token)))
       (forward-comment (- (point)))
-      (swift-mode:do-beginning-of-statement)
+      (hylo-mode:do-beginning-of-statement)
       (when (< pos (point))
         ;; no statements found
         (goto-char (point-min))))
-     ((< (point) (swift-mode:token:end previous-token))
+     ((< (point) (hylo-mode:token:end previous-token))
       ;; The pos is at C.
-      (goto-char (swift-mode:token:end previous-token))
-      (swift-mode:do-beginning-of-statement))
+      (goto-char (hylo-mode:token:end previous-token))
+      (hylo-mode:do-beginning-of-statement))
      (t
       ;; The pos is at B.
       (forward-comment (point-max))
-      (swift-mode:do-beginning-of-statement)))))
+      (hylo-mode:do-beginning-of-statement)))))
 
-(defun swift-mode:do-beginning-of-statement ()
+(defun hylo-mode:do-beginning-of-statement ()
   "Move backward to the beginning of a statement.
 Statements include comments on the same line.
 
 Intended for internal use."
   (let (parent)
     (while (progn
-             (setq parent (swift-mode:backward-sexps-until
-                           swift-mode:statement-parent-tokens))
-             (swift-mode:pseudo-implicit-semicolon-p parent)))
-    (goto-char (swift-mode:token:end parent))
+             (setq parent (hylo-mode:backward-sexps-until
+                           hylo-mode:statement-parent-tokens))
+             (hylo-mode:pseudo-implicit-semicolon-p parent)))
+    (goto-char (hylo-mode:token:end parent))
     ;; Excludes comments on previous lines but includes comments on the same
     ;; line.
     (forward-comment (- (point)))
-    (setq parent (save-excursion (swift-mode:backward-token-or-list)))
+    (setq parent (save-excursion (hylo-mode:backward-token-or-list)))
     (forward-comment (point-max))
-    (swift-mode:goto-non-comment-bol)
-    (when (< (point) (swift-mode:token:end parent))
-      (goto-char (swift-mode:token:end parent)))
-    (swift-mode:skip-whitespaces)))
+    (hylo-mode:goto-non-comment-bol)
+    (when (< (point) (hylo-mode:token:end parent))
+      (goto-char (hylo-mode:token:end parent)))
+    (hylo-mode:skip-whitespaces)))
 
-(defun swift-mode:backward-statement ()
+(defun hylo-mode:backward-statement ()
   "Move backward to the beginning of a statement.
 Statements include comments on the same line.
 
 Intended for internal use."
   (let ((pos (point)))
-    (swift-mode:beginning-of-statement)
+    (hylo-mode:beginning-of-statement)
     (when (<= pos (point))
-      (swift-mode:backward-token-or-list)
-      (swift-mode:beginning-of-statement))))
+      (hylo-mode:backward-token-or-list)
+      (hylo-mode:beginning-of-statement))))
 
-(defun swift-mode:end-of-statement ()
+(defun hylo-mode:end-of-statement ()
   "Move forward to the end of a statement.
 
 When called at the end of a sentence, keep the position.
 
 Return the next token.
 Intended for internal use."
-  (let ((chunk (swift-mode:chunk-after)))
+  (let ((chunk (hylo-mode:chunk-after)))
     (when chunk
-      (goto-char (swift-mode:chunk:start chunk))
+      (goto-char (hylo-mode:chunk:start chunk))
       (forward-comment 1)))
   (let ((pos (point))
-        (previous-token (save-excursion (swift-mode:backward-token)))
+        (previous-token (save-excursion (hylo-mode:backward-token)))
         next-token)
     (cond
      ;; Already at the end of statement.  Returns next token.
      ((and
-       (memq (swift-mode:token:type previous-token)
+       (memq (hylo-mode:token:type previous-token)
              '(\; anonymous-function-parameter-in))
-       (eq (swift-mode:token:end previous-token) pos))
-      (save-excursion (swift-mode:forward-token)))
+       (eq (hylo-mode:token:end previous-token) pos))
+      (save-excursion (hylo-mode:forward-token)))
 
      ;; Between statements, or before the first statement.
-     ((memq (swift-mode:token:type previous-token)
+     ((memq (hylo-mode:token:type previous-token)
             '(implicit-\; outside-of-buffer))
-      (swift-mode:forward-statement))
+      (hylo-mode:forward-statement))
 
      ;; Already at the end of statement.  Returns next token.
      ((progn
-        (setq next-token (save-excursion (swift-mode:forward-token)))
-        (and (memq (swift-mode:token:type next-token)
+        (setq next-token (save-excursion (hylo-mode:forward-token)))
+        (and (memq (hylo-mode:token:type next-token)
                    '(implicit-\; } outside-of-buffer))
-             (eq (swift-mode:token:end previous-token) pos)))
+             (eq (hylo-mode:token:end previous-token) pos)))
       next-token)
 
      ;; Inside a statement.
      (t
-      (swift-mode:forward-statement)))))
+      (hylo-mode:forward-statement)))))
 
-(defun swift-mode:forward-statement ()
+(defun hylo-mode:forward-statement ()
   "Move forward to the end of a statement.
 
 Return the next token.
 Intended for internal use."
-  (let ((chunk (swift-mode:chunk-after)))
+  (let ((chunk (hylo-mode:chunk-after)))
     (when chunk
-      (goto-char (swift-mode:chunk:start chunk))))
+      (goto-char (hylo-mode:chunk:start chunk))))
   (when (and (eq (char-syntax (or (char-after) ?.)) ?w)
              (eq (char-syntax (or (char-before) ?.)) ?w))
-    (swift-mode:backward-token))
+    (hylo-mode:backward-token))
   (forward-comment (point-max))
   (let ((pos (point))
         token)
     (while (progn
-             (setq token (swift-mode:forward-token-or-list))
+             (setq token (hylo-mode:forward-token-or-list))
              (or
-              (not (memq (swift-mode:token:type token)
+              (not (memq (hylo-mode:token:type token)
                          '(\; implicit-\; } anonymous-function-parameter-in
                            outside-of-buffer)))
-              (swift-mode:pseudo-implicit-semicolon-p token))))
-    (if (memq (swift-mode:token:type token)
+              (hylo-mode:pseudo-implicit-semicolon-p token))))
+    (if (memq (hylo-mode:token:type token)
               '(\; anonymous-function-parameter-in))
-        (goto-char (swift-mode:token:end token))
-      (goto-char (swift-mode:token:start token)))
-    (while (eq (swift-mode:token:type
-                (save-excursion (swift-mode:forward-token)))
+        (goto-char (hylo-mode:token:end token))
+      (goto-char (hylo-mode:token:start token)))
+    (while (eq (hylo-mode:token:type
+                (save-excursion (hylo-mode:forward-token)))
                '\;)
-      (setq token (swift-mode:forward-token)))
+      (setq token (hylo-mode:forward-token)))
     (cond
      ;; The statement is the last one in the buffer.
      ;; Goes back to the end of the statement unless we were between the end of
      ;; the statement and the end of the buffer.
-     ((eq (swift-mode:token:type token) 'outside-of-buffer)
+     ((eq (hylo-mode:token:type token) 'outside-of-buffer)
       (forward-comment (- (point)))
       (when (<= (point) pos)
-        (goto-char (swift-mode:token:end token)))
+        (goto-char (hylo-mode:token:end token)))
       token)
 
      ;; We were inside of a block.
      ;; Goes back to the end of the statement unless we were between the end of
      ;; the statement and the close bracket.
      ;; Otherwise, goes to the end of the parent statement.
-     ((eq (swift-mode:token:type token) '})
+     ((eq (hylo-mode:token:type token) '})
       (forward-comment (- (point)))
       (if (<= (point) pos)
           (progn
-            (goto-char (swift-mode:token:end token))
-            (swift-mode:end-of-statement))
+            (goto-char (hylo-mode:token:end token))
+            (hylo-mode:end-of-statement))
         token))
 
      ;; Otherwise, we have finished.
      (t token))))
 
-(defun swift-mode:end-of-defun (&optional arg)
+(defun hylo-mode:end-of-defun (&optional arg)
   "Move forward to the end of a defun.
 
 See `end-of-defun' for ARG.
@@ -408,31 +408,31 @@ and the region is not active."
     (if (<= 0 arg)
         ;; Moving forward
         (while (and result (< 0 arg))
-          (setq next-token (swift-mode:forward-statement))
+          (setq next-token (hylo-mode:forward-statement))
           (when (save-excursion
-                  (swift-mode:beginning-of-statement)
-                  (swift-mode:find-defun-keyword))
+                  (hylo-mode:beginning-of-statement)
+                  (hylo-mode:find-defun-keyword))
             (setq arg (1- arg)))
           (when (and (< 0 arg)
-                     (eq (swift-mode:token:type next-token) 'outside-of-buffer))
+                     (eq (hylo-mode:token:type next-token) 'outside-of-buffer))
             (setq result nil)))
       ;; Moving backward
       (while (and result (< arg 0))
-        (setq result (swift-mode:end-of-statement-backward))
+        (setq result (hylo-mode:end-of-statement-backward))
         (let ((statement-end-position (point)))
-          (swift-mode:beginning-of-statement)
-          (when (swift-mode:find-defun-keyword)
+          (hylo-mode:beginning-of-statement)
+          (when (hylo-mode:find-defun-keyword)
             (setq arg (1+ arg)))
           (when (eq arg 0)
             (goto-char statement-end-position)))))
     (and result
-         (eq this-command 'swift-mode:end-of-defun)
-         (not (eq last-command 'swift-mode:end-of-defun))
+         (eq this-command 'hylo-mode:end-of-defun)
+         (not (eq last-command 'hylo-mode:end-of-defun))
          (not (region-active-p))
          (push-mark pos))
     result))
 
-(defun swift-mode:end-of-statement-backward ()
+(defun hylo-mode:end-of-statement-backward ()
   "Move backward to the end of a statement.
 
 Return t if a statement found.  Return nil otherwise.
@@ -440,36 +440,36 @@ When called at the end of a statement, find the previous one.
 Intended for internal use."
   (when (save-excursion
           (let ((pos (point))
-                (token (swift-mode:backward-token-or-list)))
+                (token (hylo-mode:backward-token-or-list)))
             (and
-             (memq (swift-mode:token:type token)
+             (memq (hylo-mode:token:type token)
                    '(\; anonymous-function-parameter-in))
-             (eq (swift-mode:token:end token) pos))))
-    (swift-mode:backward-token))
+             (eq (hylo-mode:token:end token) pos))))
+    (hylo-mode:backward-token))
   (or
    ;; last statement in non-empty block
    (and
-    (let ((next-token (save-excursion (swift-mode:forward-token))))
-      (memq (swift-mode:token:type next-token) '(} outside-of-buffer)))
+    (let ((next-token (save-excursion (hylo-mode:forward-token))))
+      (memq (hylo-mode:token:type next-token) '(} outside-of-buffer)))
     (let ((previous-token (save-excursion
                             (forward-comment (- (point)))
-                            (swift-mode:backward-token))))
-      (not (eq (swift-mode:token:type previous-token) '{)))
+                            (hylo-mode:backward-token))))
+      (not (eq (hylo-mode:token:type previous-token) '{)))
     (let ((pos (point)))
       (forward-comment (- (point)))
       (< (point) pos)))
    ;; other cases
    (let (token)
      (while (progn
-              (setq token (swift-mode:backward-sexps-until
+              (setq token (hylo-mode:backward-sexps-until
                            '(\; implicit-\; anonymous-function-parameter-in)))
-              (swift-mode:pseudo-implicit-semicolon-p token)))
-     (when (memq (swift-mode:token:type token)
+              (hylo-mode:pseudo-implicit-semicolon-p token)))
+     (when (memq (hylo-mode:token:type token)
                  '(\; anonymous-function-parameter-in))
-       (goto-char (swift-mode:token:end token)))
-     (not (eq (swift-mode:token:type token) 'outside-of-buffer)))))
+       (goto-char (hylo-mode:token:end token)))
+     (not (eq (hylo-mode:token:type token) 'outside-of-buffer)))))
 
-(defun swift-mode:pseudo-implicit-semicolon-p (token)
+(defun hylo-mode:pseudo-implicit-semicolon-p (token)
   "Return t if TOKEN is an implicit semicolon not at end of a statement.
 
 Return nil otherwise."
@@ -487,19 +487,19 @@ Return nil otherwise."
   ;; catch {
   ;; }
   (and
-   (eq (swift-mode:token:type token) 'implicit-\;)
+   (eq (hylo-mode:token:type token) 'implicit-\;)
    (save-excursion
-     (goto-char (swift-mode:token:end token))
-     (let ((next-token (swift-mode:forward-token)))
+     (goto-char (hylo-mode:token:end token))
+     (let ((next-token (hylo-mode:forward-token)))
        (or
-        (eq (swift-mode:token:type next-token) '{)
-        (member (swift-mode:token:text next-token) '("catch" "else")))))))
+        (eq (hylo-mode:token:type next-token) '{)
+        (member (hylo-mode:token:text next-token) '("catch" "else")))))))
 
-(defun swift-mode:mark-defun (&optional arg allow-extend)
+(defun hylo-mode:mark-defun (&optional arg allow-extend)
   "Put mark at the end of defun, point at the beginning of defun.
 
 If the point is between defuns, mark depend on
-`swift-mode:mark-defun-preference'.
+`hylo-mode:mark-defun-preference'.
 
 If ARG is a positive number, mark that many following defuns.  If ARG is
 negative, reverse direction of marking.  If those defuns have lesser nesting
@@ -509,34 +509,34 @@ If ALLOW-EXTEND is non-nil or called interactively, and the command is repeated
 or the region is active, mark the following (if the point is before the mark)
 or preceding (if the point is after the mark) defun."
   (interactive (list (prefix-numeric-value current-prefix-arg) t))
-  (let ((region (swift-mode:mark-generic-block
+  (let ((region (hylo-mode:mark-generic-block
                  arg
                  allow-extend
-                 #'swift-mode:end-of-defun
-                 #'swift-mode:beginning-of-defun)))
+                 #'hylo-mode:end-of-defun
+                 #'hylo-mode:beginning-of-defun)))
     (if (and  (not region) (called-interactively-p 'interactive))
         (progn (message "No defun found") nil)
       region)))
 
-(defun swift-mode:narrow-to-defun (&optional include-comments)
+(defun hylo-mode:narrow-to-defun (&optional include-comments)
   "Make text outside current defun invisible.
 
 If the point is between defuns, narrow depend on
-`swift-mode:mark-defun-preference'.
+`hylo-mode:mark-defun-preference'.
 
 Preceding comments are included if INCLUDE-COMMENTS is non-nil.
 Interactively, the behavior depends on ‘narrow-to-defun-include-comments’."
   (interactive (list (and (boundp 'narrow-to-defun-include-comments)
                           narrow-to-defun-include-comments)))
-  (let ((region (swift-mode:narrow-to-generic-block
+  (let ((region (hylo-mode:narrow-to-generic-block
                  include-comments
-                 #'swift-mode:end-of-defun
-                 #'swift-mode:beginning-of-defun)))
+                 #'hylo-mode:end-of-defun
+                 #'hylo-mode:beginning-of-defun)))
     (if (and  (not region) (called-interactively-p 'interactive))
         (progn (message "No defun found") nil)
       region)))
 
-(defun swift-mode:forward-sentence (&optional arg)
+(defun hylo-mode:forward-sentence (&optional arg)
   "Skip forward sentences or statements.
 
 In comments or strings, skip a sentence.  Otherwise, skip a statement.
@@ -547,20 +547,20 @@ Return t if a sentence is found.  Return nil otherwise."
   (interactive "p")
   (setq arg (or arg 1))
   (if (< arg 0)
-      (swift-mode:backward-sentence (- arg))
+      (hylo-mode:backward-sentence (- arg))
     (let ((result t))
       (while (and result (< 0 arg))
-        (setq result (swift-mode:forward-sentence-1))
+        (setq result (hylo-mode:forward-sentence-1))
         (setq arg (1- arg)))
       result)))
 
-(defun swift-mode:mark-generic-block (arg
+(defun hylo-mode:mark-generic-block (arg
                                       allow-extend
                                       move-forward
                                       move-backward)
   "Put mark at the end of generic block, point at the beginning of it.
 
-The direction of marking depend on `swift-mode:mark-defun-preference'.
+The direction of marking depend on `hylo-mode:mark-defun-preference'.
 
 If ARG is a positive number, mark that many blocks.  If ARG is negative,
 reverse direction of marking.  If those blocks have lesser nesting level than
@@ -579,8 +579,8 @@ Both functions return t if succeeded, return nil otherwise."
         (direction
          (if (and allow-extend
                   (and (eq last-command this-command) (mark t)))
-             swift-mode:last-mark-direction
-           swift-mode:mark-defun-preference))
+             hylo-mode:last-mark-direction
+           hylo-mode:mark-defun-preference))
         (original-region
          (if (and allow-extend
                   (or
@@ -605,7 +605,7 @@ Both functions return t if succeeded, return nil otherwise."
     (setq new-direction direction)
     (while (and new-region (< 0 count))
       (let ((new-region-and-direction
-             (swift-mode:extend-region-to-be-marked
+             (hylo-mode:extend-region-to-be-marked
               new-region
               new-direction
               move-forward
@@ -617,7 +617,7 @@ Both functions return t if succeeded, return nil otherwise."
         (setq last-successful-region new-region))
       (setq count (1- count)))
     (setq new-region (or new-region last-successful-region))
-    (setq swift-mode:last-mark-direction new-direction)
+    (setq hylo-mode:last-mark-direction new-direction)
     (and
      new-region
      (progn
@@ -630,7 +630,7 @@ Both functions return t if succeeded, return nil otherwise."
            (exchange-point-and-mark)))
        new-region))))
 
-(defun swift-mode:extend-region-to-be-marked (original-region
+(defun hylo-mode:extend-region-to-be-marked (original-region
                                               direction
                                               move-forward
                                               move-backward
@@ -648,7 +648,7 @@ PREFERRED-DIRECTION is the preferred direction of extension when DIRECTION is
   (let* ((new-region-and-direction
           (cond
            ((eq direction 'containing)
-            (swift-mode:containing-generic-block-region
+            (hylo-mode:containing-generic-block-region
              original-region
              move-forward move-backward
              preferred-direction))
@@ -656,14 +656,14 @@ PREFERRED-DIRECTION is the preferred direction of extension when DIRECTION is
             (list
              (save-excursion
                (goto-char (car original-region))
-               (swift-mode:preceding-generic-block-region
+               (hylo-mode:preceding-generic-block-region
                 move-forward move-backward))
              'preceding))
            ((eq direction 'following)
             (list
              (save-excursion
                (goto-char (cdr original-region))
-               (swift-mode:following-generic-block-region
+               (hylo-mode:following-generic-block-region
                 move-forward move-backward))
              'following))))
          (new-region (nth 0 new-region-and-direction))
@@ -685,7 +685,7 @@ PREFERRED-DIRECTION is the preferred direction of extension when DIRECTION is
         (setcdr new-region (max (cdr new-region) (point)))))
     (list new-region new-direction)))
 
-(defun swift-mode:following-generic-block-region (move-forward move-backward)
+(defun hylo-mode:following-generic-block-region (move-forward move-backward)
   "Return cons representing a region of following generic block.
 
 MOVE-FORWARD is a function moving the cursor to the next end of block.
@@ -697,7 +697,7 @@ Both functions return t if succeeded, return nil otherwise."
            (beginning (and end (funcall move-backward) (point))))
       (and beginning (cons beginning end)))))
 
-(defun swift-mode:preceding-generic-block-region (move-forward move-backward)
+(defun hylo-mode:preceding-generic-block-region (move-forward move-backward)
   "Return cons representing a region of preceding generic block.
 
 MOVE-FORWARD is a function moving the cursor to the next end of block.
@@ -709,7 +709,7 @@ Both functions return t if succeeded, return nil otherwise."
            (end (and beginning (funcall move-forward) (point))))
       (and end (cons beginning end)))))
 
-(defun swift-mode:containing-generic-block-region (original-region
+(defun hylo-mode:containing-generic-block-region (original-region
                                                    move-forward
                                                    move-backward
                                                    &optional
@@ -740,13 +740,13 @@ Otherwise, try to mark the following one."
               (if (eq preferred-direction 'preceding)
                   (save-excursion
                     (goto-char start-pos)
-                    (swift-mode:preceding-generic-block-region
+                    (hylo-mode:preceding-generic-block-region
                      move-forward move-backward))
                 (save-excursion
                   (goto-char end-pos)
-                  (swift-mode:following-generic-block-region
+                  (hylo-mode:following-generic-block-region
                    move-forward move-backward))))
-        (setq extended (swift-mode:extend-region-with-spaces region))
+        (setq extended (hylo-mode:extend-region-with-spaces region))
         (and extended (<= (car extended) start-pos end-pos (cdr extended))))
       (list region preferred-direction))
 
@@ -757,13 +757,13 @@ Otherwise, try to mark the following one."
               (if (eq preferred-direction 'preceding)
                   (save-excursion
                     (goto-char end-pos)
-                    (swift-mode:following-generic-block-region
+                    (hylo-mode:following-generic-block-region
                      move-forward move-backward))
                 (save-excursion
                   (goto-char start-pos)
-                  (swift-mode:preceding-generic-block-region
+                  (hylo-mode:preceding-generic-block-region
                    move-forward move-backward))))
-        (setq extended (swift-mode:extend-region-with-spaces region))
+        (setq extended (hylo-mode:extend-region-with-spaces region))
         (and extended (<= (car extended) start-pos end-pos (cdr extended))))
       (list region
             (if (eq preferred-direction 'preceding) 'following 'preceding)))
@@ -779,7 +779,7 @@ Otherwise, try to mark the following one."
      ;; }
      (t
       (save-excursion
-        (catch 'swift-mode:found-block
+        (catch 'hylo-mode:found-block
           (let ((start start-pos)
                 (end end-pos))
             (goto-char end-pos)
@@ -788,7 +788,7 @@ Otherwise, try to mark the following one."
               (save-excursion
                 (funcall move-backward)
                 (when (<= (point) start-pos end-pos end)
-                  (throw 'swift-mode:found-block
+                  (throw 'hylo-mode:found-block
                          (list (cons (point) end) 'containing)))))
             (when (= end (point))
               ;; Got unmatched parens.
@@ -799,15 +799,15 @@ Otherwise, try to mark the following one."
                 (save-excursion
                   (funcall move-forward)
                   (when (<= start start-pos end-pos (point))
-                    (throw 'swift-mode:found-block
+                    (throw 'hylo-mode:found-block
                            (list (cons start (point)) 'containing)))
                   (funcall move-backward)
                   (when (/= start (point))
-                    (throw 'swift-mode:found-block
+                    (throw 'hylo-mode:found-block
                            (list (cons start end) 'containing)))))))
           (list (cons (point-min) (point-max)) 'containing)))))))
 
-(defun swift-mode:extend-region-with-spaces (region)
+(defun hylo-mode:extend-region-with-spaces (region)
   "Return REGION extended with surrounding spaces."
   (and region
        (let ((beginning (car region))
@@ -822,12 +822,12 @@ Otherwise, try to mark the following one."
            (setq end (point)))
          (cons beginning end))))
 
-(defun swift-mode:narrow-to-generic-block
+(defun hylo-mode:narrow-to-generic-block
     (&optional include-comments move-forward move-backward)
   "Make text outside current generic block invisible.
 
 If the point is between blocks, narrow depend on
-`swift-mode:mark-defun-preference'.
+`hylo-mode:mark-defun-preference'.
 
 Preceding comments are included if INCLUDE-COMMENTS is non-nil.
 Interactively, the behavior depends on ‘narrow-to-defun-include-comments’.
@@ -843,20 +843,20 @@ Both functions return t if succeeded, return nil otherwise."
       (widen)
       (setq region
             (cond
-             ((eq swift-mode:mark-defun-preference 'containing)
-              (nth 0 (swift-mode:containing-generic-block-region
+             ((eq hylo-mode:mark-defun-preference 'containing)
+              (nth 0 (hylo-mode:containing-generic-block-region
                       (cons (point) (point))
                       move-forward move-backward)))
 
-             ((eq swift-mode:mark-defun-preference 'preceding)
-              (swift-mode:preceding-generic-block-region
+             ((eq hylo-mode:mark-defun-preference 'preceding)
+              (hylo-mode:preceding-generic-block-region
                move-forward move-backward))
 
-             ((eq swift-mode:mark-defun-preference 'following)
-              (swift-mode:following-generic-block-region
+             ((eq hylo-mode:mark-defun-preference 'following)
+              (hylo-mode:following-generic-block-region
                move-forward move-backward))))
       (setq extended
-            (and region (swift-mode:extend-region-with-spaces region)))
+            (and region (hylo-mode:extend-region-with-spaces region)))
       (when (and extended include-comments)
         (save-excursion
           (goto-char (car extended))
@@ -872,7 +872,7 @@ Both functions return t if succeeded, return nil otherwise."
         (narrow-to-region (car restriction) (cdr restriction))
         nil))))
 
-(defun swift-mode:backward-sentence (&optional arg)
+(defun hylo-mode:backward-sentence (&optional arg)
   "Skip backward sentences or statements.
 
 In comments or strings, skip a sentence.  Otherwise, skip a statement.
@@ -883,27 +883,27 @@ Return t if a sentence is found.  Return nil otherwise."
   (interactive "p")
   (setq arg (or arg 1))
   (if (< arg 0)
-      (swift-mode:forward-sentence (- arg))
+      (hylo-mode:forward-sentence (- arg))
     (let ((result t))
       (while (and result (< 0 arg))
-        (setq result (swift-mode:backward-sentence-1))
+        (setq result (hylo-mode:backward-sentence-1))
         (setq arg (1- arg)))
       result)))
 
-(defun swift-mode:forward-sentence-1 ()
+(defun hylo-mode:forward-sentence-1 ()
   "Skip forward a sentence or a statement.
 
 In comments or strings, skip a sentence.  Otherwise, skip a statement."
-  (let ((chunk (swift-mode:chunk-after)))
+  (let ((chunk (hylo-mode:chunk-after)))
     (cond
      ;; Inside a comment.
-     ((swift-mode:chunk:comment-p chunk)
-      (swift-mode:forward-sentence-inside-comment
-       (swift-mode:chunk:single-line-comment-p chunk)))
+     ((hylo-mode:chunk:comment-p chunk)
+      (hylo-mode:forward-sentence-inside-comment
+       (hylo-mode:chunk:single-line-comment-p chunk)))
 
      ;; Inside a string.
-     ((swift-mode:chunk:string-p chunk)
-      (swift-mode:forward-sentence-inside-string))
+     ((hylo-mode:chunk:string-p chunk)
+      (hylo-mode:forward-sentence-inside-string))
 
      ;; Spaces at the beginning of 2nd and following lines.
      ;; Between the beginning of the line and "ccc" and "ddd" bellow:
@@ -926,30 +926,30 @@ In comments or strings, skip a sentence.  Otherwise, skip a statement."
              (not (bobp))
              (progn
                (backward-char)
-               (swift-mode:chunk:comment-p (swift-mode:chunk-after)))))
+               (hylo-mode:chunk:comment-p (hylo-mode:chunk-after)))))
       (forward-line 0)
       (skip-syntax-forward " ")
       (forward-char 2)
-      (swift-mode:forward-sentence-inside-comment t))
+      (hylo-mode:forward-sentence-inside-comment t))
 
      ;; Otherwise
      (t
-      (swift-mode:forward-sentence-inside-code)))))
+      (hylo-mode:forward-sentence-inside-code)))))
 
-(defun swift-mode:backward-sentence-1 ()
+(defun hylo-mode:backward-sentence-1 ()
   "Skip backward a sentence or a statement.
 
 In comments or strings, skip a sentence.  Otherwise, skip a statement."
-  (let ((chunk (swift-mode:chunk-after)))
+  (let ((chunk (hylo-mode:chunk-after)))
     (cond
      ;; Inside a comment.
-     ((swift-mode:chunk:comment-p chunk)
-      (swift-mode:backward-sentence-inside-comment
-       (swift-mode:chunk:single-line-comment-p chunk)))
+     ((hylo-mode:chunk:comment-p chunk)
+      (hylo-mode:backward-sentence-inside-comment
+       (hylo-mode:chunk:single-line-comment-p chunk)))
 
      ;; Inside a string.
-     ((swift-mode:chunk:string-p chunk)
-      (swift-mode:backward-sentence-inside-string))
+     ((hylo-mode:chunk:string-p chunk)
+      (hylo-mode:backward-sentence-inside-string))
 
      ;; Spaces at the beginning of 2nd and following lines.
      ;; Between the beginning of the line and "ccc" and "ddd" bellow:
@@ -972,17 +972,17 @@ In comments or strings, skip a sentence.  Otherwise, skip a statement."
              (not (bobp))
              (progn
                (backward-char)
-               (swift-mode:chunk:comment-p (swift-mode:chunk-after)))))
+               (hylo-mode:chunk:comment-p (hylo-mode:chunk-after)))))
       (forward-line 0)
       (skip-syntax-forward " ")
       (forward-char 2)
-      (swift-mode:backward-sentence-inside-comment t))
+      (hylo-mode:backward-sentence-inside-comment t))
 
      ;; Otherwise
      (t
-      (swift-mode:backward-sentence-inside-code)))))
+      (hylo-mode:backward-sentence-inside-code)))))
 
-(defmacro swift-mode:with-temp-comment-buffer (&rest body)
+(defmacro hylo-mode:with-temp-comment-buffer (&rest body)
   "Eval BODY inside a temporary buffer keeping sentence related variables."
   (declare (indent 0) (debug t))
   (let ((current-sentence-end (make-symbol "current-sentence-end"))
@@ -1005,7 +1005,7 @@ In comments or strings, skip a sentence.  Otherwise, skip a statement."
          (setq-local fill-prefix ,current-fill-prefix)
          ,@body))))
 
-(defun swift-mode:forward-sentence-inside-comment (is-single-line)
+(defun hylo-mode:forward-sentence-inside-comment (is-single-line)
   "Skip forward a sentence in a comment.
 
 IS-SINGLE-LINE should be non-nil when called inside a single-line comment."
@@ -1024,11 +1024,11 @@ IS-SINGLE-LINE should be non-nil when called inside a single-line comment."
         (pos (point))
         (comment-block-end-position
          (if is-single-line
-             (swift-mode:comment-block-end-position-single-line)
-           (swift-mode:comment-block-end-position-multiline)))
+             (hylo-mode:comment-block-end-position-single-line)
+           (hylo-mode:comment-block-end-position-multiline)))
         offset-from-line-end
         line-count)
-    (swift-mode:with-temp-comment-buffer
+    (hylo-mode:with-temp-comment-buffer
       (insert-buffer-substring current-buffer pos comment-block-end-position)
       (goto-char (point-min))
       ;; Removes comment starters.
@@ -1072,9 +1072,9 @@ IS-SINGLE-LINE should be non-nil when called inside a single-line comment."
     (or (/= (point) pos)
         (progn
           (goto-char comment-block-end-position)
-          (swift-mode:forward-sentence-inside-code nil)))))
+          (hylo-mode:forward-sentence-inside-code nil)))))
 
-(defun swift-mode:backward-sentence-inside-comment (is-single-line)
+(defun hylo-mode:backward-sentence-inside-comment (is-single-line)
   "Skip backward a sentence in a comment.
 
 IS-SINGLE-LINE should be non-nil when called inside a single-line comment."
@@ -1087,11 +1087,11 @@ IS-SINGLE-LINE should be non-nil when called inside a single-line comment."
         (line-end-position (line-end-position))
         (comment-block-beginning-position
          (if is-single-line
-             (swift-mode:comment-block-beginning-position-single-line)
-           (swift-mode:comment-block-beginning-position-multiline)))
+             (hylo-mode:comment-block-beginning-position-single-line)
+           (hylo-mode:comment-block-beginning-position-multiline)))
         offset-from-line-end
         line-count)
-    (swift-mode:with-temp-comment-buffer
+    (hylo-mode:with-temp-comment-buffer
       (insert-buffer-substring
        current-buffer comment-block-beginning-position line-end-position)
       (goto-char (- (line-end-position) (- line-end-position pos)))
@@ -1121,9 +1121,9 @@ IS-SINGLE-LINE should be non-nil when called inside a single-line comment."
     (or (< (point) pos)
         (progn
           (goto-char comment-block-beginning-position)
-          (swift-mode:backward-sentence-inside-code t)))))
+          (hylo-mode:backward-sentence-inside-code t)))))
 
-(defun swift-mode:comment-block-end-position-single-line ()
+(defun hylo-mode:comment-block-end-position-single-line ()
   "Return the position of the end of a single-line comment block.
 
 A single-line comment block consists of a single-line comments at the beginning
@@ -1142,8 +1142,8 @@ of lines.  Empty lines split blocks.  Example:
     foo() // This comment is not a part of the block."
   (save-excursion
     (let ((comment-block-end-position nil))
-      (while (and (swift-mode:chunk:single-line-comment-p
-                   (swift-mode:chunk-after))
+      (while (and (hylo-mode:chunk:single-line-comment-p
+                   (hylo-mode:chunk-after))
                   (not (eobp)))
         (end-of-line)
         (setq comment-block-end-position (point))
@@ -1152,7 +1152,7 @@ of lines.  Empty lines split blocks.  Example:
         (skip-chars-forward "/"))
       comment-block-end-position)))
 
-(defun swift-mode:comment-block-beginning-position-single-line ()
+(defun hylo-mode:comment-block-beginning-position-single-line ()
   "Return the position of the beginning of a single-line comment block.
 
 A single-line comment block consists of a single-line comments at the beginning
@@ -1173,41 +1173,41 @@ of lines.  Empty lines split blocks.  Example:
     (let (chunk
           (comment-block-beginning-position nil))
       (while (progn
-               (setq chunk (swift-mode:chunk-after))
-               (swift-mode:chunk:single-line-comment-p chunk))
-        (goto-char (swift-mode:chunk:start chunk))
+               (setq chunk (hylo-mode:chunk-after))
+               (hylo-mode:chunk:single-line-comment-p chunk))
+        (goto-char (hylo-mode:chunk:start chunk))
         (setq comment-block-beginning-position (point))
         (skip-syntax-backward " ")
         (unless (bobp) (backward-char)))
       comment-block-beginning-position)))
 
-(defun swift-mode:comment-block-end-position-multiline ()
+(defun hylo-mode:comment-block-end-position-multiline ()
   "Return the position of the end of a multiline comment."
   (save-excursion
-    (goto-char (swift-mode:chunk:start (swift-mode:chunk-after)))
+    (goto-char (hylo-mode:chunk:start (hylo-mode:chunk-after)))
     (forward-comment 1)
     (point)))
 
-(defun swift-mode:comment-block-beginning-position-multiline ()
+(defun hylo-mode:comment-block-beginning-position-multiline ()
   "Return the position of the beginning of a multiline comment."
-  (swift-mode:chunk:start (swift-mode:chunk-after)))
+  (hylo-mode:chunk:start (hylo-mode:chunk-after)))
 
-(defun swift-mode:forward-sentence-inside-string ()
+(defun hylo-mode:forward-sentence-inside-string ()
   "Skip forward a sentence in a string."
   (let ((string-end-position
          (save-excursion
-           (goto-char (swift-mode:chunk:start (swift-mode:chunk-after)))
-           (swift-mode:forward-string-chunk)
+           (goto-char (hylo-mode:chunk:start (hylo-mode:chunk-after)))
+           (hylo-mode:forward-string-chunk)
            (point))))
     (forward-sentence)
     (or (<= (point) string-end-position)
         (progn
           (goto-char string-end-position)
           (if (eq (char-before) ?\()
-              (swift-mode:forward-sentence-inside-interpolated-expression)
-            (swift-mode:forward-sentence-inside-code t))))))
+              (hylo-mode:forward-sentence-inside-interpolated-expression)
+            (hylo-mode:forward-sentence-inside-code t))))))
 
-(defun swift-mode:backward-sentence-inside-string ()
+(defun hylo-mode:backward-sentence-inside-string ()
   "Skip backward a sentence in a string."
   ;; Skips quotes at the end.
   (when (and
@@ -1219,7 +1219,7 @@ of lines.  Empty lines split blocks.  Example:
     (skip-chars-backward "\""))
   (let ((pos (point))
         (string-beginning-position
-         (swift-mode:chunk:start (swift-mode:chunk-after))))
+         (hylo-mode:chunk:start (hylo-mode:chunk-after))))
     (backward-sentence)
     (or (<= string-beginning-position (point))
         (progn
@@ -1235,54 +1235,54 @@ of lines.  Empty lines split blocks.  Example:
             t)
 
            ((eq (char-after) ?\))
-            (swift-mode:backward-sentence-inside-interpolated-expression))
+            (hylo-mode:backward-sentence-inside-interpolated-expression))
 
            (t
-            (swift-mode:backward-sentence-inside-code t)))))))
+            (hylo-mode:backward-sentence-inside-code t)))))))
 
-(defun swift-mode:forward-sentence-inside-interpolated-expression ()
+(defun hylo-mode:forward-sentence-inside-interpolated-expression ()
   "Skip forward a sentence in a interpolated expression."
-  (let* ((string-chunk (swift-mode:find-following-string-chunk))
+  (let* ((string-chunk (hylo-mode:find-following-string-chunk))
          (interpolated-expression-end-position
-          (swift-mode:token:start string-chunk)))
-    (swift-mode:forward-statement)
+          (hylo-mode:token:start string-chunk)))
+    (hylo-mode:forward-statement)
     (or (<= (point) interpolated-expression-end-position)
         (progn
           (goto-char interpolated-expression-end-position)
           (forward-char)
-          (swift-mode:forward-sentence-inside-string)))))
+          (hylo-mode:forward-sentence-inside-string)))))
 
-(defun swift-mode:backward-sentence-inside-interpolated-expression ()
+(defun hylo-mode:backward-sentence-inside-interpolated-expression ()
   "Skip backward a sentence in a interpolated expression."
-  (let* ((string-chunk (swift-mode:find-preceeding-string-chunk))
+  (let* ((string-chunk (hylo-mode:find-preceeding-string-chunk))
          (interpolated-expression-beginning-position
-          (swift-mode:token:end string-chunk)))
-    (swift-mode:backward-statement)
+          (hylo-mode:token:end string-chunk)))
+    (hylo-mode:backward-statement)
     (or (<= interpolated-expression-beginning-position (point))
         (progn
           (goto-char interpolated-expression-beginning-position)
           (backward-char)
-          (swift-mode:backward-sentence-inside-string)))))
+          (hylo-mode:backward-sentence-inside-string)))))
 
-(defun swift-mode:find-following-string-chunk ()
+(defun hylo-mode:find-following-string-chunk ()
   "Return the following string-chunk token."
   (save-excursion
     (let (token)
       (while (progn
-               (setq token (swift-mode:forward-token-or-list))
+               (setq token (hylo-mode:forward-token-or-list))
                (not (memq
-                     (swift-mode:token:type token)
+                     (hylo-mode:token:type token)
                      '(outside-of-buffer
                        string-chunk-after-interpolated-expression)))))
       token)))
 
-(defun swift-mode:find-preceeding-string-chunk ()
+(defun hylo-mode:find-preceeding-string-chunk ()
   "Return the preceeding string-chunk token."
   (save-excursion
-    (swift-mode:backward-sexps-until
+    (hylo-mode:backward-sexps-until
      '(string-chunk-before-interpolated-expression))))
 
-(defun swift-mode:forward-sentence-inside-code
+(defun hylo-mode:forward-sentence-inside-code
     (&optional keep-position-if-at-end-of-sentence)
   "Skip forward a statement.
 
@@ -1292,14 +1292,14 @@ the end of a sentence, keep the position."
            (not (bobp))
            ;; Not just before a string.
            (get-text-property (1- (point)) 'syntax-multiline))
-      (swift-mode:forward-sentence-inside-interpolated-expression)
+      (hylo-mode:forward-sentence-inside-interpolated-expression)
     (if keep-position-if-at-end-of-sentence
-        (progn (swift-mode:end-of-statement) t)
+        (progn (hylo-mode:end-of-statement) t)
       (let ((pos (point)))
-        (swift-mode:forward-statement)
+        (hylo-mode:forward-statement)
         (< pos (point))))))
 
-(defun swift-mode:backward-sentence-inside-code
+(defun hylo-mode:backward-sentence-inside-code
     (&optional keep-position-if-at-beginning-of-sentence)
   "Skip backward a statement.
 
@@ -1309,14 +1309,14 @@ already at the beginning of a sentence, keep the position."
            (not (bobp))
            ;; Not just before a string.
            (get-text-property (1- (point)) 'syntax-multiline))
-      (swift-mode:backward-sentence-inside-interpolated-expression)
+      (hylo-mode:backward-sentence-inside-interpolated-expression)
     (if keep-position-if-at-beginning-of-sentence
-        (progn (swift-mode:beginning-of-statement) t)
+        (progn (hylo-mode:beginning-of-statement) t)
       (let ((pos (point)))
-        (swift-mode:backward-statement)
+        (hylo-mode:backward-statement)
         (< (point) pos)))))
 
-(defun swift-mode:kill-sentence (&optional arg)
+(defun hylo-mode:kill-sentence (&optional arg)
   "Kill from the point to the end of sentences.
 
 With ARG, kill to the end of the ARG-th sentence.  If ARG is negative, kill
@@ -1324,9 +1324,9 @@ backwards."
   (interactive "p")
   (kill-region
    (point)
-   (save-excursion (swift-mode:forward-sentence arg) (point))))
+   (save-excursion (hylo-mode:forward-sentence arg) (point))))
 
-(defun swift-mode:backward-kill-sentence (&optional arg)
+(defun hylo-mode:backward-kill-sentence (&optional arg)
   "Kill from the point to the beginning of sentences.
 
 With ARG, kill to the beginning of the ARG-th sentence.  If ARG is negative,
@@ -1334,13 +1334,13 @@ kill forwards."
   (interactive "p")
   (kill-region
    (point)
-   (save-excursion (swift-mode:backward-sentence arg) (point))))
+   (save-excursion (hylo-mode:backward-sentence arg) (point))))
 
-(defun swift-mode:mark-sentence (&optional arg allow-extend)
+(defun hylo-mode:mark-sentence (&optional arg allow-extend)
   "Put mark at the end of sentence, point at the beginning of sentence.
 
 If the point is between sentence, mark depend on
-`swift-mode:mark-defun-preference'.
+`hylo-mode:mark-defun-preference'.
 
 If ARG is a positive number, mark that many following sentences.  If ARG is
 negative, reverse direction of marking.  If those sentences have lesser
@@ -1350,40 +1350,40 @@ If ALLOW-EXTEND is non-nil or called interactively, and the command is repeated
 or the region is active, mark the following (if the point is before the mark)
 or preceding (if the point is after the mark) sentence."
   (interactive (list (prefix-numeric-value current-prefix-arg) t))
-  (let ((region (swift-mode:mark-generic-block arg
+  (let ((region (hylo-mode:mark-generic-block arg
                                                allow-extend
-                                               #'swift-mode:forward-sentence
-                                               #'swift-mode:backward-sentence)))
+                                               #'hylo-mode:forward-sentence
+                                               #'hylo-mode:backward-sentence)))
     (if (and (not region)  (called-interactively-p 'interactive))
         (progn (message "No sentence found") nil)
       region)))
 
-(defun swift-mode:narrow-to-sentence (&optional include-comments)
+(defun hylo-mode:narrow-to-sentence (&optional include-comments)
   "Make text outside current sentence invisible.
 
 If the point is between sentences, narrow depend on
-`swift-mode:mark-defun-preference'.
+`hylo-mode:mark-defun-preference'.
 
 Preceding comments are included if INCLUDE-COMMENTS is non-nil.
 Interactively, the behavior depends on ‘narrow-to-defun-include-comments’."
   (interactive (list (and (boundp 'narrow-to-defun-include-comments)
                           narrow-to-defun-include-comments)))
-  (let ((region (swift-mode:narrow-to-generic-block
+  (let ((region (hylo-mode:narrow-to-generic-block
                  include-comments
-                 #'swift-mode:forward-sentence
-                 #'swift-mode:backward-sentence)))
+                 #'hylo-mode:forward-sentence
+                 #'hylo-mode:backward-sentence)))
     (if (and  (not region) (called-interactively-p 'interactive))
         (progn (message "No sentence found") nil)
       region)))
 
-(defun swift-mode:current-defun-name ()
+(defun hylo-mode:current-defun-name ()
   "Return fully qualified name of defun under the point."
   (save-excursion
-    (let ((token-list (reverse (swift-mode:current-defun-name-token-list)))
+    (let ((token-list (reverse (hylo-mode:current-defun-name-token-list)))
           text)
       (if token-list
           (mapconcat (lambda (token)
-                       (setq text (swift-mode:token:text token))
+                       (setq text (hylo-mode:token:text token))
                        (if (eq (aref text 0) ?`)
                            (substring text 1 (1- (length text)))
                          text))
@@ -1391,60 +1391,60 @@ Interactively, the behavior depends on ‘narrow-to-defun-include-comments’."
                      ".")
         nil))))
 
-(defun swift-mode:current-defun-name-token-list ()
+(defun hylo-mode:current-defun-name-token-list ()
   "Return a list of defun name tokens under the point.
 
 The first element is the name token of the current defun.  The rest are the ones
 of ancestors."
   (if (bobp)
       nil
-    (let ((name-token (swift-mode:current-defun-name-token))
+    (let ((name-token (hylo-mode:current-defun-name-token))
           name-tokens
           next-token)
       (if name-token
           (progn
             (save-excursion
-              (swift-mode:backward-sexps-until-open-curly-bracket)
-              (setq name-tokens (swift-mode:current-defun-name-token-list)))
+              (hylo-mode:backward-sexps-until-open-curly-bracket)
+              (setq name-tokens (hylo-mode:current-defun-name-token-list)))
             (while name-token
               (push name-token name-tokens)
-              (goto-char (swift-mode:token:end name-token))
-              (setq next-token (swift-mode:forward-token-or-list))
-              (when (eq (swift-mode:token:type next-token) '<>)
-                (setq next-token (swift-mode:forward-token-or-list)))
+              (goto-char (hylo-mode:token:end name-token))
+              (setq next-token (hylo-mode:forward-token-or-list))
+              (when (eq (hylo-mode:token:type next-token) '<>)
+                (setq next-token (hylo-mode:forward-token-or-list)))
               (setq name-token
-                    (when (equal (swift-mode:token:text next-token) ".")
-                      (setq next-token (swift-mode:forward-token-or-list))
-                      (when (eq (swift-mode:token:type next-token) 'identifier)
+                    (when (equal (hylo-mode:token:text next-token) ".")
+                      (setq next-token (hylo-mode:forward-token-or-list))
+                      (when (eq (hylo-mode:token:type next-token) 'identifier)
                         next-token))))
             name-tokens)
-        (swift-mode:backward-sexps-until-open-curly-bracket)
-        (swift-mode:current-defun-name-token-list)))))
+        (hylo-mode:backward-sexps-until-open-curly-bracket)
+        (hylo-mode:current-defun-name-token-list)))))
 
-(defun swift-mode:current-defun-name-token ()
+(defun hylo-mode:current-defun-name-token ()
   "Return the name token of the defun under the point."
   (let ((pos (point))
         keyword-token
         keyword-text
         next-token
         name-token)
-    (goto-char (caar (swift-mode:containing-generic-block-region
+    (goto-char (caar (hylo-mode:containing-generic-block-region
                       (cons (point) (point))
-                      #'swift-mode:end-of-defun
-                      #'swift-mode:beginning-of-defun)))
+                      #'hylo-mode:end-of-defun
+                      #'hylo-mode:beginning-of-defun)))
 
     (save-excursion
-      (setq keyword-token (swift-mode:find-defun-keyword))
-      (setq keyword-text (swift-mode:token:text keyword-token))
+      (setq keyword-token (hylo-mode:find-defun-keyword))
+      (setq keyword-text (hylo-mode:token:text keyword-token))
       (when keyword-token
-        (goto-char (swift-mode:token:end keyword-token)))
+        (goto-char (hylo-mode:token:end keyword-token)))
       (setq
        name-token
        (cond
         ((member keyword-text
                  '("typealias" "associatedtype" "precedencegroup" "func" "macro"
                    "class" "enum" "struct" "actor" "protocol" "extension"))
-         (swift-mode:forward-token))
+         (hylo-mode:forward-token))
 
         ((member keyword-text '("init" "deinit" "subscript"))
          keyword-token)
@@ -1471,31 +1471,31 @@ of ancestors."
          ;;   let (x, y) = (1, 1) // not supported yet
          ;; }
          (while (< (point) pos)
-           (setq next-token (swift-mode:forward-token-or-list)))
+           (setq next-token (hylo-mode:forward-token-or-list)))
          (when next-token
-           (goto-char (swift-mode:token:start next-token)))
-         (goto-char (swift-mode:token:end
-                     (swift-mode:backward-sexps-until (list keyword-text '\,))))
-         (setq next-token (swift-mode:forward-token))
+           (goto-char (hylo-mode:token:start next-token)))
+         (goto-char (hylo-mode:token:end
+                     (hylo-mode:backward-sexps-until (list keyword-text '\,))))
+         (setq next-token (hylo-mode:forward-token))
          (if (and
-              (eq (swift-mode:token:type next-token) 'identifier)
+              (eq (hylo-mode:token:type next-token) 'identifier)
               (not
-               (equal (swift-mode:token:text (swift-mode:forward-token)) ".")))
+               (equal (hylo-mode:token:text (hylo-mode:forward-token)) ".")))
              next-token
            ;; FIXME: Complex patterns.
            nil))
 
         ((member keyword-text '("prefix" "postfix" "infix"))
-         (and (equal (swift-mode:token:text (swift-mode:forward-token))
+         (and (equal (hylo-mode:token:text (hylo-mode:forward-token))
                      "operator")
-              (swift-mode:forward-token)))
+              (hylo-mode:forward-token)))
 
         ;; Ignored: "import" "get" "set" "willSet" "didSet"
         (t nil))))
-    (if (eq (swift-mode:token:type name-token) 'identifier)
+    (if (eq (hylo-mode:token:type name-token) 'identifier)
         name-token
       nil)))
 
-(provide 'swift-mode-beginning-of-defun)
+(provide 'hylo-mode-beginning-of-defun)
 
-;;; swift-mode-beginning-of-defun.el ends here
+;;; hylo-mode-beginning-of-defun.el ends here

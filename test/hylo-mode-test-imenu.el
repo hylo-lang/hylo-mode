@@ -1,4 +1,4 @@
-;;; swift-mode-test-imenu.el --- Test for swift-mode: Imenu -*- lexical-binding: t -*-
+;;; hylo-mode-test-imenu.el --- Test for hylo-mode: Imenu -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2019 taku0
 
@@ -21,39 +21,39 @@
 
 ;;; Commentary:
 
-;; Test for swift-mode: Imenu.
-;; Execute swift-mode:run-test:imenu interactively or in batch mode.
+;; Test for hylo-mode: Imenu.
+;; Execute hylo-mode:run-test:imenu interactively or in batch mode.
 
 ;;; Code:
 
-(require 'swift-mode)
-(require 'swift-mode-test)
-(require 'swift-mode-imenu)
+(require 'hylo-mode)
+(require 'hylo-mode-test)
+(require 'hylo-mode-imenu)
 
-(defun swift-mode:run-test:imenu
+(defun hylo-mode:run-test:imenu
     (&optional error-buffer error-counts progress-reporter)
-  "Run `imenu' test for `swift-mode'.
+  "Run `imenu' test for `hylo-mode'.
 
 ERROR-BUFFER is the buffer to output errors.
 ERROR-COUNTS is a association list holding counts of errors.  Updated
 destructively.
 PROGRESS-REPORTER is the progress-reporter."
   (interactive)
-  (if (not swift-mode:test:running)
-      (swift-mode:run-test '(swift-mode:run-test:imenu))
+  (if (not hylo-mode:test:running)
+      (hylo-mode:run-test '(hylo-mode:run-test:imenu))
     (setq default-directory
-          (concat (file-name-as-directory swift-mode:test:basedir)
-                  (file-name-as-directory "swift-files")
+          (concat (file-name-as-directory hylo-mode:test:basedir)
+                  (file-name-as-directory "hylo-files")
                   "imenu"))
-    (dolist (swift-file (file-expand-wildcards "*.swift"))
+    (dolist (hylo-file (file-expand-wildcards "*.hylo"))
       (redisplay)
       (with-temp-buffer
         (switch-to-buffer (current-buffer))
-        (insert-file-contents-literally swift-file)
-        (swift-mode)
-        (let* ((actual (swift-mode:scan-declarations))
+        (insert-file-contents-literally hylo-file)
+        (hylo-mode)
+        (let* ((actual (hylo-mode:scan-declarations))
                (expected-file-name (concat
-                                    (file-name-sans-extension swift-file)
+                                    (file-name-sans-extension hylo-file)
                                     "-expected.eld"))
                (expected
                 (with-temp-buffer
@@ -62,8 +62,8 @@ PROGRESS-REPORTER is the progress-reporter."
                (status (if (equal actual expected) 'ok 'error))
                (count-assoc (assq status error-counts)))
           (when (eq status 'error)
-            (swift-mode:show-error
-             error-buffer swift-file 0
+            (hylo-mode:show-error
+             error-buffer hylo-file 0
              "error"
              (concat
               "expected: "
@@ -74,7 +74,6 @@ PROGRESS-REPORTER is the progress-reporter."
       (when (not noninteractive)
         (progress-reporter-update progress-reporter)))))
 
-(provide 'swift-mode-test-imenu)
+(provide 'hylo-mode-test-imenu)
 
-;;; swift-mode-test-imenu.el ends here
-
+;;; hylo-mode-test-imenu.el ends here

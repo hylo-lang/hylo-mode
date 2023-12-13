@@ -1,4 +1,4 @@
-((emacs-lisp-mode . ((package-lint-main-file . "swift-mode.el")
+((emacs-lisp-mode . ((package-lint-main-file . "hylo-mode.el")
                      (eval . (checkdoc-minor-mode))
                      (indent-tabs-mode . nil)
                      (fill-column . 80)

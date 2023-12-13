@@ -1,7 +1,7 @@
-// swift-mode:test:eval (setq-local swift-mode:basic-offset 4)
-// swift-mode:test:eval (setq-local swift-mode:parenthesized-expression-offset 2)
-// swift-mode:test:eval (setq-local swift-mode:multiline-statement-offset 2)
-// swift-mode:test:eval (setq-local swift-mode:switch-case-offset 0)
+// hylo-mode:test:eval (setq-local hylo-mode:basic-offset 4)
+// hylo-mode:test:eval (setq-local hylo-mode:parenthesized-expression-offset 2)
+// hylo-mode:test:eval (setq-local hylo-mode:multiline-statement-offset 2)
+// hylo-mode:test:eval (setq-local hylo-mode:switch-case-offset 0)
 
 
 // Simple case
@@ -38,7 +38,7 @@ let x = 1 +// abc
   3
 
 // Comments behave like whitespaces
-// https://github.com/apple/swift-evolution/blob/master/proposals/0037-clarify-comments-and-operators.md
+// https://github.com/apple/hylo-evolution/blob/master/proposals/0037-clarify-comments-and-operators.md
 let x = 1
 /*a*/+++foo()
 
@@ -67,4 +67,4 @@ let x = a++.
 // Unicode operators
 
 let x = a ×
-  a  // swift-mode:test:known-bug
+  a  // hylo-mode:test:known-bug

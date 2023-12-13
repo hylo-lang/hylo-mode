@@ -1,4 +1,4 @@
-;;; swift-mode-test.el --- Test for swift-mode  -*- lexical-binding: t -*-
+;;; hylo-mode-test.el --- Test for hylo-mode  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2016-2019 taku0
 
@@ -21,43 +21,43 @@
 
 ;;; Commentary:
 
-;; Tests for swift-mode.
-;; Execute swift-mode:run-test interactively or in batch mode.
+;; Tests for hylo-mode.
+;; Execute hylo-mode:run-test interactively or in batch mode.
 
 ;;; Code:
 
-(defvar swift-mode:test:basedir
+(defvar hylo-mode:test:basedir
   (file-name-directory (if (fboundp 'macroexp-file-name) (macroexp-file-name)
                          (or load-file-name buffer-file-name))))
 
-(defvar swift-mode:test:running nil)
+(defvar hylo-mode:test:running nil)
 
-(defun swift-mode:setup-error-buffer ()
+(defun hylo-mode:setup-error-buffer ()
   "Initialize and switch to the error buffer.
 
 Return the error-buffer"
-  (pop-to-buffer (get-buffer-create "*swift-mode-test*"))
+  (pop-to-buffer (get-buffer-create "*hylo-mode-test*"))
   (fundamental-mode)
   (setq buffer-read-only nil)
   (erase-buffer)
   (current-buffer))
 
-(defun swift-mode:run-test (&optional tests)
-  "Run TESTS for `swift-mode'."
+(defun hylo-mode:run-test (&optional tests)
+  "Run TESTS for `hylo-mode'."
   (interactive)
 
   (unless tests
-    (dolist (test-source (directory-files swift-mode:test:basedir
-                                          t "swift-mode-test-.*.el"))
+    (dolist (test-source (directory-files hylo-mode:test:basedir
+                                          t "hylo-mode-test-.*.el"))
       (load (file-name-sans-extension test-source) nil 'nomsg))
     (mapatoms (lambda (sym)
                 (and (fboundp sym)
-                     (string-match "\\`swift-mode:run-test:"
+                     (string-match "\\`hylo-mode:run-test:"
                                    (symbol-name sym))
                      (push sym tests)))))
 
   (let ((error-buffer
-         (if noninteractive nil (swift-mode:setup-error-buffer)))
+         (if noninteractive nil (hylo-mode:setup-error-buffer)))
         (error-counts (list
                        (cons 'error 0)
                        (cons 'warning 0)
@@ -66,17 +66,17 @@ Return the error-buffer"
         (progress-reporter (unless noninteractive
                              (make-progress-reporter "Running tests..."))))
 
-    (setq swift-mode:test:running t)
+    (setq hylo-mode:test:running t)
 
     (unwind-protect
         (dolist (test tests)
           (funcall test error-buffer error-counts progress-reporter))
-      (setq swift-mode:test:running nil))
+      (setq hylo-mode:test:running nil))
 
     (when (not noninteractive)
       (progress-reporter-done progress-reporter))
 
-    (swift-mode:print-message
+    (hylo-mode:print-message
      error-buffer
      (concat
       "Errors: " (prin1-to-string (assoc-default 'error error-counts)) "\n"
@@ -88,7 +88,7 @@ Return the error-buffer"
         (kill-emacs (min 63 (assoc-default 'error error-counts)))
       (compilation-mode))))
 
-(defun swift-mode:show-error (error-buffer file line level message)
+(defun hylo-mode:show-error (error-buffer file line level message)
   "Show an error message to the ERROR-BUFFER or stdout.
 
 If the Emacs is in the batch mode, the message is printed to the stdout.
@@ -100,7 +100,7 @@ LEVEL is the error level (e.g. error, warning).
 MESSAGE is the error message."
   (let ((formatted
          (concat
-          "swift-mode-test:"
+          "hylo-mode-test:"
           file
           ":"
           (prin1-to-string line)
@@ -109,9 +109,9 @@ MESSAGE is the error message."
           ": "
           message
           "\n")))
-    (swift-mode:print-message error-buffer formatted)))
+    (hylo-mode:print-message error-buffer formatted)))
 
-(defun swift-mode:print-message (error-buffer message)
+(defun hylo-mode:print-message (error-buffer message)
   "Print a message to the ERROR-BUFFER or stdout.
 
 If the Emacs is in the batch mode, MESSAGE is printed to the stdout.
@@ -122,6 +122,6 @@ Otherwise, MESSAGE is appended to the ERROR-BUFFER."
       (goto-char (point-max))
       (insert-and-inherit message))))
 
-(provide 'swift-mode-test)
+(provide 'hylo-mode-test)
 
-;;; swift-mode-test.el ends here
+;;; hylo-mode-test.el ends here

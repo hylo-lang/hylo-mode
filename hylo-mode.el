@@ -1,4 +1,4 @@
-;;; swift-mode.el --- Major-mode for Apple's Swift programming language -*- lexical-binding: t -*-
+;;; hylo-mode.el --- Major-mode for the Hylo programming language -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014-2021 taku0, Chris Barrett, Bozhidar Batsov,
 ;;                         Arthur Evstifeev
@@ -11,8 +11,8 @@
 ;;
 ;; Version: 9.1.0
 ;; Package-Requires: ((emacs "24.4") (seq "2.3"))
-;; Keywords: languages swift
-;; URL: https://github.com/swift-emacs/swift-mode
+;; Keywords: languages hylo
+;; URL: https://github.com/hylo-emacs/hylo-mode
 
 ;; This file is not part of GNU Emacs.
 
@@ -31,146 +31,146 @@
 
 ;;; Commentary:
 
-;; Major-mode for Apple's Swift programming language.
+;; Major-mode for the Hylo programming language.
 
 ;;; Code:
 
-(require 'swift-mode-lexer)
-(require 'swift-mode-indent)
-(require 'swift-mode-fill)
-(require 'swift-mode-font-lock)
-(require 'swift-mode-beginning-of-defun)
-(require 'swift-mode-repl)
-(require 'swift-mode-imenu)
+(require 'hylo-mode-lexer)
+(require 'hylo-mode-indent)
+(require 'hylo-mode-fill)
+(require 'hylo-mode-font-lock)
+(require 'hylo-mode-beginning-of-defun)
+(require 'hylo-mode-repl)
+(require 'hylo-mode-imenu)
 
 ;;;###autoload
-(defgroup swift nil
-  "Major-mode for Apple's Swift programming language."
+(defgroup hylo nil
+  "Major-mode for the Hylo programming language."
   :group 'languages
-  :prefix "swift-mode:")
+  :prefix "hylo-mode:")
 
 ;; WORKAROUND: `update-directory-autoloads' does not handle `:group'.
 ;; Fixed in 29.1 https://debbugs.gnu.org/cgi/bugreport.cgi?bug=58015.
 ;; commit: 212e94c3f445ebe1388f6fab134133ebad9316d0
-;;;###autoload (custom-add-load 'languages 'swift-mode)
+;;;###autoload (custom-add-load 'languages 'hylo-mode)
 
 ;; WORKAROUND: `cus-load' overrides `custom-loads'
 ;; Fixed in 29.1 https://debbugs.gnu.org/cgi/bugreport.cgi?bug=58015.
 ;; commit: 75b3f4d0ac00bf47459629615ab2246c8a34b4c6
 ;;;###autoload (with-eval-after-load 'cus-load
-;;;###autoload   (custom-add-load 'languages 'swift-mode))
+;;;###autoload   (custom-add-load 'languages 'hylo-mode))
 
 ;;; Keymap
 
-(defvar swift-mode-map
+(defvar hylo-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map prog-mode-map)
     (define-key map [remap indent-new-comment-line]
-                #'swift-mode:indent-new-comment-line)
-    (define-key map (kbd "C-c C-z") #'swift-mode:run-repl)
-    (define-key map (kbd "C-c C-f") #'swift-mode:send-buffer)
-    (define-key map (kbd "C-c C-r") #'swift-mode:send-region)
-    (define-key map [remap beginning-of-defun] #'swift-mode:beginning-of-defun)
-    (define-key map [remap end-of-defun] #'swift-mode:end-of-defun)
-    (define-key map [remap mark-defun] #'swift-mode:mark-defun)
-    (define-key map [remap narrow-to-defun] #'swift-mode:narrow-to-defun)
-    (define-key map [remap backward-sentence] #'swift-mode:backward-sentence)
-    (define-key map [remap forward-sentence] #'swift-mode:forward-sentence)
-    (define-key map [remap kill-sentence] #'swift-mode:kill-sentence)
+                #'hylo-mode:indent-new-comment-line)
+    (define-key map (kbd "C-c C-z") #'hylo-mode:run-repl)
+    (define-key map (kbd "C-c C-f") #'hylo-mode:send-buffer)
+    (define-key map (kbd "C-c C-r") #'hylo-mode:send-region)
+    (define-key map [remap beginning-of-defun] #'hylo-mode:beginning-of-defun)
+    (define-key map [remap end-of-defun] #'hylo-mode:end-of-defun)
+    (define-key map [remap mark-defun] #'hylo-mode:mark-defun)
+    (define-key map [remap narrow-to-defun] #'hylo-mode:narrow-to-defun)
+    (define-key map [remap backward-sentence] #'hylo-mode:backward-sentence)
+    (define-key map [remap forward-sentence] #'hylo-mode:forward-sentence)
+    (define-key map [remap kill-sentence] #'hylo-mode:kill-sentence)
     (define-key map [remap backward-kill-sentence]
-                #'swift-mode:backward-kill-sentence)
-    ;; (define-key map (kbd "???") #'swift-mode:mark-sentence)
-    (define-key map [remap narrow-to-sentence] #'swift-mode:narrow-to-sentence)
+                #'hylo-mode:backward-kill-sentence)
+    ;; (define-key map (kbd "???") #'hylo-mode:mark-sentence)
+    (define-key map [remap narrow-to-sentence] #'hylo-mode:narrow-to-sentence)
 
-    (easy-menu-define swift-menu map "Swift Mode menu"
-      `("Swift"
-        :help "Swift-specific Features"
-        ["Run REPL" swift-mode:run-repl
-         :help "Run Swift REPL"]
-        ["Send buffer to REPL" swift-mode:send-buffer
+    (easy-menu-define hylo-menu map "Hylo Mode menu"
+      `("Hylo"
+        :help "Hylo-specific Features"
+        ["Run REPL" hylo-mode:run-repl
+         :help "Run Hylo REPL"]
+        ["Send buffer to REPL" hylo-mode:send-buffer
          :help "Send the current buffer's contents to the REPL"]
-        ["Send region to REPL" swift-mode:send-region
+        ["Send region to REPL" hylo-mode:send-region
          :help "Send currently selected region to the REPL"]
-        ["Build Swift module" swift-mode:build-swift-module
-         :help "Build current Swift module"]
-        ["Build iOS app" swift-mode:build-ios-app
+        ["Build Hylo module" hylo-mode:build-hylo-module
+         :help "Build current Hylo module"]
+        ["Build iOS app" hylo-mode:build-ios-app
          :help "Build current iOS app"]
-        ["Debug Swift module" swift-mode:debug-swift-module
-         :help "Debug current Swift module"]
-        ["Debug iOS app" swift-mode:debug-ios-app
+        ["Debug Hylo module" hylo-mode:debug-hylo-module
+         :help "Debug current Hylo module"]
+        ["Debug iOS app" hylo-mode:debug-ios-app
          :help "Debug current iOS app with simulator"]))
     map)
-  "Swift mode key map.")
+  "Hylo mode key map.")
 
 ;;; `forward-sexp-function'
 
-(defun swift-mode:forward-sexp (&optional arg)
+(defun hylo-mode:forward-sexp (&optional arg)
   "Move forward/backward a token or list.
 
 See `forward-sexp for ARG."
   (setq arg (or arg 1))
-  (when (swift-mode:chunk-after)
-    (goto-char (swift-mode:chunk:start (swift-mode:chunk-after))))
+  (when (hylo-mode:chunk-after)
+    (goto-char (hylo-mode:chunk:start (hylo-mode:chunk-after))))
   (if (< 0 arg)
       (while (< 0 arg)
-        (while (eq (swift-mode:token:type (swift-mode:forward-sexp-1))
+        (while (eq (hylo-mode:token:type (hylo-mode:forward-sexp-1))
                    'implicit-\;))
         (setq arg (1- arg))))
   (while (< arg 0)
-    (while (eq (swift-mode:token:type (swift-mode:backward-sexp-1))
+    (while (eq (hylo-mode:token:type (hylo-mode:backward-sexp-1))
                'implicit-\;))
     (setq arg (1+ arg))))
 
-(defun swift-mode:forward-sexp-1 ()
+(defun hylo-mode:forward-sexp-1 ()
   "Move forward a token or list.
 
 Signal `scan-error' if it hits closing parentheses."
-  (let ((token (swift-mode:forward-token-or-list))
+  (let ((token (hylo-mode:forward-token-or-list))
         (pos (point)))
-    (when (memq (swift-mode:token:type token) '(\] \) }))
+    (when (memq (hylo-mode:token:type token) '(\] \) }))
       (goto-char pos)
       (signal 'scan-error
               (list "Unbalanced parentheses"
-                    (swift-mode:token:start token)
-                    (swift-mode:token:end token))))
+                    (hylo-mode:token:start token)
+                    (hylo-mode:token:end token))))
     token))
 
-(defun swift-mode:backward-sexp-1 ()
+(defun hylo-mode:backward-sexp-1 ()
   "Move backward a token or list.
 
 Signal `scan-error' if it hits opening parentheses."
-  (let ((token (swift-mode:backward-token-or-list))
+  (let ((token (hylo-mode:backward-token-or-list))
         (pos (point)))
-    (when (memq (swift-mode:token:type token) '(\[ \( {))
+    (when (memq (hylo-mode:token:type token) '(\[ \( {))
       (goto-char pos)
       (signal 'scan-error
               (list "Unbalanced parentheses"
-                    (swift-mode:token:start token)
-                    (swift-mode:token:end token))))
+                    (hylo-mode:token:start token)
+                    (hylo-mode:token:end token))))
     token))
 
 (declare-function speedbar-add-supported-extension "speedbar" (extension))
 
 ;;;###autoload
-(defsubst swift-mode:add-supported-extension-for-speedbar ()
-  "Register .swift to speedbar."
+(defsubst hylo-mode:add-supported-extension-for-speedbar ()
+  "Register .hylo to speedbar."
   ;; FIXME: Use `with-eval-after-load' when `package-lint' allows it.
-  ;; See also https://github.com/swift-emacs/swift-mode/pull/179
+  ;; See also https://github.com/hylo-emacs/hylo-mode/pull/179
   (if (fboundp 'speedbar-add-supported-extension)
-      (speedbar-add-supported-extension ".swift")
+      (speedbar-add-supported-extension ".hylo")
     (add-hook 'speedbar-load-hook
               (lambda ()
-                (speedbar-add-supported-extension ".swift")))))
+                (speedbar-add-supported-extension ".hylo")))))
 
 ;;;###autoload
-(define-derived-mode swift-mode prog-mode "Swift"
-  "Major mode for editing Swift code.
+(define-derived-mode hylo-mode prog-mode "Hylo"
+  "Major mode for editing Hylo code.
 
-\\{swift-mode-map}"
-  :syntax-table swift-mode:syntax-table
-  :group 'swift
+\\{hylo-mode-map}"
+  :syntax-table hylo-mode:syntax-table
+  :group 'hylo
 
-  (setq font-lock-defaults '(swift-mode:font-lock-keywords))
+  (setq font-lock-defaults '(hylo-mode:font-lock-keywords))
 
   (setq-local comment-start "// ")
   (setq-local comment-end "")
@@ -200,51 +200,51 @@ Signal `scan-error' if it hits opening parentheses."
                "\\s *"))
   (setq-local fill-indent-according-to-mode t)
   (setq-local comment-multi-line t)
-  (setq-local comment-line-break-function #'swift-mode:indent-new-comment-line)
-  (setq-local fill-paragraph-function #'swift-mode:fill-paragraph)
+  (setq-local comment-line-break-function #'hylo-mode:indent-new-comment-line)
+  (setq-local fill-paragraph-function #'hylo-mode:fill-paragraph)
   (setq-local fill-forward-paragraph-function
-              #'swift-mode:fill-forward-paragraph)
-  (setq-local normal-auto-fill-function #'swift-mode:do-auto-fill)
-  (swift-mode:install-fill-region-as-paragraph-advice)
-  (swift-mode:install-current-fill-column-advice)
+              #'hylo-mode:fill-forward-paragraph)
+  (setq-local normal-auto-fill-function #'hylo-mode:do-auto-fill)
+  (hylo-mode:install-fill-region-as-paragraph-advice)
+  (hylo-mode:install-current-fill-column-advice)
 
   (setq-local parse-sexp-lookup-properties t)
   (add-hook 'syntax-propertize-extend-region-functions
-            #'swift-mode:syntax-propertize-extend-region
+            #'hylo-mode:syntax-propertize-extend-region
             nil t)
-  (setq-local syntax-propertize-function #'swift-mode:syntax-propertize)
+  (setq-local syntax-propertize-function #'hylo-mode:syntax-propertize)
 
   (setq-local indent-tabs-mode nil)
-  (setq-local indent-line-function #'swift-mode:indent-line)
+  (setq-local indent-line-function #'hylo-mode:indent-line)
 
-  (setq-local forward-sexp-function #'swift-mode:forward-sexp)
+  (setq-local forward-sexp-function #'hylo-mode:forward-sexp)
 
   (setq-local electric-indent-chars
               (append "{}()[]:;,." electric-indent-chars))
 
-  (add-hook 'post-self-insert-hook #'swift-mode:post-self-insert nil t)
+  (add-hook 'post-self-insert-hook #'hylo-mode:post-self-insert nil t)
 
-  (setq-local imenu-create-index-function #'swift-mode:imenu-create-index)
+  (setq-local imenu-create-index-function #'hylo-mode:imenu-create-index)
 
-  (setq-local beginning-of-defun-function #'swift-mode:beginning-of-defun)
-  (setq-local end-of-defun-function #'swift-mode:end-of-defun)
+  (setq-local beginning-of-defun-function #'hylo-mode:beginning-of-defun)
+  (setq-local end-of-defun-function #'hylo-mode:end-of-defun)
 
-  (setq-local swift-mode:anchor-overlay
+  (setq-local hylo-mode:anchor-overlay
               (make-overlay (point-min) (point-min) nil t))
 
-  (delete-overlay swift-mode:anchor-overlay)
+  (delete-overlay hylo-mode:anchor-overlay)
 
   (add-hook 'which-func-functions
             (lambda ()
               (when (equal (with-current-buffer (current-buffer) major-mode)
-                           'swift-mode)
-                (swift-mode:current-defun-name))))
-  (setq-local add-log-current-defun-function #'swift-mode:current-defun-name))
+                           'hylo-mode)
+                (hylo-mode:current-defun-name))))
+  (setq-local add-log-current-defun-function #'hylo-mode:current-defun-name))
 
-;;;###autoload (add-to-list 'auto-mode-alist '("\\.swift\\(interface\\)?\\'" . swift-mode))
+;;;###autoload (add-to-list 'auto-mode-alist '("\\.hylo\\(interface\\)?\\'" . hylo-mode))
 
-;;;###autoload (swift-mode:add-supported-extension-for-speedbar)
+;;;###autoload (hylo-mode:add-supported-extension-for-speedbar)
 
-(provide 'swift-mode)
+(provide 'hylo-mode)
 
-;;; swift-mode.el ends here
+;;; hylo-mode.el ends here

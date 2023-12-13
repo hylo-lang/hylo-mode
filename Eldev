@@ -6,9 +6,9 @@
 (eldev-add-loading-roots 'test "test")
 
 (setq elisp-lint-indent-specs
-      '((swift-mode:with-temp-comment-buffer . 0)))
+      '((hylo-mode:with-temp-comment-buffer . 0)))
 
-(setq-default package-lint-main-file "swift-mode.el")
+(setq-default package-lint-main-file "hylo-mode.el")
 (setq-default indent-tabs-mode nil)
 (setq-default fill-column 80)
 (setq-default tab-width 8)
@@ -20,7 +20,7 @@
                 t))
   (advice-add #'package-lint--valid-definition-name-p :around
               (lambda (oldfun name prefix &rest args)
-                (or (equal name "run-swift")
+                (or (equal name "run-hylo")
                     (apply oldfun name prefix args)))))
 
 (defvar elisp-lint--url-in-document-regexp

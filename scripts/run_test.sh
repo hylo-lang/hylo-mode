@@ -8,5 +8,5 @@
   --eval "(add-to-list 'load-path \"$(readlink -f .)\")" \
   --eval "(add-to-list 'load-path \"$(readlink -f .)/test\")" \
   --eval "(setq debug-on-error t)" \
-  -l test/swift-mode-test.el \
-  -f swift-mode:run-test
+  -l test/hylo-mode-test.el \
+  -f hylo-mode:run-test

@@ -14,7 +14,7 @@ repository. Follow the guidelines below to make sure everything goes smoothly.
     - An example is worth a thousand words. For example:
 
       > It should be indented like this:
-      ```swift
+      ```hylo
       guard
         var x = xx else {
           foo()
@@ -22,7 +22,7 @@ repository. Follow the guidelines below to make sure everything goes smoothly.
       }
       ```
       > But actually it is indented like this:
-      ```swift
+      ```hylo
       guard
         var x = xx else {
             foo()
@@ -47,7 +47,7 @@ repository. Follow the guidelines below to make sure everything goes smoothly.
 
 ### Naming
 
-Use a `swift-mode:` prefix.
+Use a `hylo-mode:` prefix.
 
 ### Docstrings
 

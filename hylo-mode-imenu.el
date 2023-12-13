@@ -1,4 +1,4 @@
-;;; swift-mode-imenu.el --- Major-mode for Apple's Swift programming language, , Imenu -*- lexical-binding: t -*-
+;;; hylo-mode-imenu.el --- Major-mode for the Hylo programming language, , Imenu -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2019-2021 taku0
 
@@ -25,16 +25,16 @@
 
 ;;; Code:
 
-(require 'swift-mode-lexer)
-(require 'swift-mode-indent)
+(require 'hylo-mode-lexer)
+(require 'hylo-mode-indent)
 (require 'seq)
 
 ;;;###autoload
-(defgroup swift-mode:imenu nil
+(defgroup hylo-mode:imenu nil
   "Imenu."
-  :group 'swift)
+  :group 'hylo)
 
-(defcustom swift-mode:imenu-style
+(defcustom hylo-mode:imenu-style
   'nested
   "Style of Imenu hierarchy.
 
@@ -46,7 +46,7 @@ Values:
                  (const :tag "Flat" flat))
   :safe #'symbolp)
 
-(defun swift-mode:declaration (type name-token children)
+(defun hylo-mode:declaration (type name-token children)
   "Construct and return a declaration.
 
 TYPE is the type of the declaration such as `class' or `struct'.
@@ -55,27 +55,27 @@ it is the keyword token itself.
 CHILDREN is the child declarations if exists."
   (list type name-token children))
 
-(defun swift-mode:declaration:type (declaration)
+(defun hylo-mode:declaration:type (declaration)
   "Return the type of DECLARATION."
   (nth 0 declaration))
 
-(defun swift-mode:declaration:name-token (declaration)
+(defun hylo-mode:declaration:name-token (declaration)
   "Return the name token of DECLARATION."
   (nth 1 declaration))
 
-(defun swift-mode:declaration:children (declaration)
+(defun hylo-mode:declaration:children (declaration)
   "Return the children of DECLARATION."
   (nth 2 declaration))
 
 
-(defun swift-mode:imenu-create-index (&optional style)
+(defun hylo-mode:imenu-create-index (&optional style)
   "Create an index alist of the current buffer for Imenu.
 
 STYLE is either `nested' or `flat', defaults to `nested'.
 If it is `nested', class and its members are organized as trees.
 If it is `flat', declarations are organized into a flat list of fully qualified
 names."
-  (unless style (setq style swift-mode:imenu-style))
+  (unless style (setq style hylo-mode:imenu-style))
   (save-excursion
     (goto-char (point-min))
 
@@ -84,18 +84,18 @@ names."
                                "*Customize*"
                                0
                                (lambda (_name _position)
-                                 (customize-group 'swift-mode:imenu)))))
-      (while (not (eq (swift-mode:token:type
-                       (save-excursion (swift-mode:forward-token)))
+                                 (customize-group 'hylo-mode:imenu)))))
+      (while (not (eq (hylo-mode:token:type
+                       (save-excursion (hylo-mode:forward-token)))
                       'outside-of-buffer))
         (setq declarations
-              (append (swift-mode:scan-declarations) declarations)))
+              (append (hylo-mode:scan-declarations) declarations)))
       (append (if (eq style 'flat)
-                  (swift-mode:format-for-imenu:flat (nreverse declarations))
-                (swift-mode:format-for-imenu:nested (nreverse declarations)))
+                  (hylo-mode:format-for-imenu:flat (nreverse declarations))
+                (hylo-mode:format-for-imenu:nested (nreverse declarations)))
               (list customization-item)))))
 
-(defun swift-mode:scan-declarations ()
+(defun hylo-mode:scan-declarations ()
   "Scan declarations from current point.
 
 Return found declarations in reverse order."
@@ -108,20 +108,20 @@ Return found declarations in reverse order."
         (declarations '()))
     (while (not done)
       (setq next-token
-            (swift-mode:forward-token-or-list-except-curly-bracket))
-      (when (and (eq (swift-mode:token:type next-token) 'implicit-\;)
+            (hylo-mode:forward-token-or-list-except-curly-bracket))
+      (when (and (eq (hylo-mode:token:type next-token) 'implicit-\;)
                  (save-excursion
-                   (swift-mode:skip-whitespaces)
+                   (hylo-mode:skip-whitespaces)
                    (eq (char-after) ?\{)))
-        (setq next-token (swift-mode:forward-token)))
-      (setq next-type (swift-mode:token:type next-token))
-      (setq next-text (swift-mode:token:text next-token))
+        (setq next-token (hylo-mode:forward-token)))
+      (setq next-type (hylo-mode:token:type next-token))
+      (setq next-text (hylo-mode:token:text next-token))
       (cond
        ((equal next-text "import")
         ;; Skips an import kind, for example, "class" token below:
         ;;
         ;; import class Foo.Bar
-        (swift-mode:forward-token-or-list-except-curly-bracket))
+        (hylo-mode:forward-token-or-list-except-curly-bracket))
 
        ((equal next-text "class")
         ;; "class" token may be either a class declaration keyword or a
@@ -143,22 +143,22 @@ Return found declarations in reverse order."
          ;; Having pending "class" token
          (last-class-token
           (save-excursion
-            (goto-char (swift-mode:token:end last-class-token))
-            (setq name-token (swift-mode:forward-token)))
+            (goto-char (hylo-mode:token:end last-class-token))
+            (setq name-token (hylo-mode:forward-token)))
           (setq last-class-token nil)
-          (when (eq (swift-mode:token:type name-token) 'identifier)
+          (when (eq (hylo-mode:token:type name-token) 'identifier)
             (push
-             (swift-mode:declaration
+             (hylo-mode:declaration
               'class
               name-token
               (when (eq next-type '{)
-                (nreverse (swift-mode:scan-declarations))))
+                (nreverse (hylo-mode:scan-declarations))))
              declarations)))
 
          ;; Closure or other unknown block
          ((eq next-type '{)
-          (goto-char (swift-mode:token:start next-token))
-          (swift-mode:forward-token-or-list))
+          (goto-char (hylo-mode:token:start next-token))
+          (hylo-mode:forward-token-or-list))
 
          ;; Ignores the token otherwise.
          ))
@@ -166,123 +166,123 @@ Return found declarations in reverse order."
        ((member next-text '("struct" "protocol" "extension" "enum" "actor"))
         (setq last-class-token nil)
         (let ((declaration
-               (swift-mode:scan-declarations:handle-struct-like next-token)))
+               (hylo-mode:scan-declarations:handle-struct-like next-token)))
           (when declaration
             (push declaration declarations))))
 
        ((equal next-text "case")
         (setq last-class-token nil)
         (let ((case-declarations
-               (swift-mode:scan-declarations:handle-case-or-variable 'case)))
+               (hylo-mode:scan-declarations:handle-case-or-variable 'case)))
           (setq declarations (append case-declarations declarations))))
 
        ((member next-text '("typealias" "associatedtype"))
         (setq last-class-token nil)
         (setq name-token
-              (swift-mode:forward-token-or-list-except-curly-bracket))
-        (when (eq (swift-mode:token:type name-token) 'identifier)
+              (hylo-mode:forward-token-or-list-except-curly-bracket))
+        (when (eq (hylo-mode:token:type name-token) 'identifier)
           (push
-           (swift-mode:declaration (intern next-text) name-token nil)
+           (hylo-mode:declaration (intern next-text) name-token nil)
            declarations)))
 
        ((member next-text '("func" "init" "subscript" "macro"))
         (setq last-class-token nil)
         (unless (member next-text '("func" "macro"))
-          (goto-char (swift-mode:token:start next-token)))
+          (goto-char (hylo-mode:token:start next-token)))
         (let ((declaration-type (intern next-text))
-              (names (swift-mode:scan-function-name-and-parameter-names)))
+              (names (hylo-mode:scan-function-name-and-parameter-names)))
           (when names
             (setq name-token (car names))
             (push
-             (swift-mode:declaration
+             (hylo-mode:declaration
               declaration-type
-              (swift-mode:token
-               (swift-mode:token:type name-token)
-               (concat (swift-mode:token:text name-token)
+              (hylo-mode:token
+               (hylo-mode:token:type name-token)
+               (concat (hylo-mode:token:text name-token)
                        "("
                        (mapconcat
                         (lambda (token)
-                          (concat (swift-mode:token:text token) ":"))
+                          (concat (hylo-mode:token:text token) ":"))
                         (cdr names)
                         "")
                        ")")
-               (swift-mode:token:start name-token)
-               (swift-mode:token:end name-token))
+               (hylo-mode:token:start name-token)
+               (hylo-mode:token:end name-token))
               nil)
              declarations))))
 
        ((equal next-text "deinit")
         (setq last-class-token nil)
-        (push (swift-mode:declaration 'deinit next-token nil) declarations))
+        (push (hylo-mode:declaration 'deinit next-token nil) declarations))
 
        ((member next-text '("let" "var"))
         (setq last-class-token nil)
         (let ((variable-declarations
-               (swift-mode:scan-declarations:handle-case-or-variable
+               (hylo-mode:scan-declarations:handle-case-or-variable
                 (intern next-text))))
           (setq declarations (append variable-declarations declarations))))
 
        ((member next-text '("prefix" "postfix" "infix"))
         (setq last-class-token nil)
         (setq next-token
-              (swift-mode:forward-token-or-list-except-curly-bracket))
-        (when (equal (swift-mode:token:text next-token) "operator")
+              (hylo-mode:forward-token-or-list-except-curly-bracket))
+        (when (equal (hylo-mode:token:text next-token) "operator")
           (setq name-token
-                (swift-mode:forward-token-or-list-except-curly-bracket))
-          (when (eq (swift-mode:token:type name-token) 'identifier)
+                (hylo-mode:forward-token-or-list-except-curly-bracket))
+          (when (eq (hylo-mode:token:type name-token) 'identifier)
             (push
-             (swift-mode:declaration 'operator name-token nil)
+             (hylo-mode:declaration 'operator name-token nil)
              declarations))))
 
        ((equal next-text "precedencegroup")
         (setq last-class-token nil)
         (setq name-token
-              (swift-mode:forward-token-or-list-except-curly-bracket))
-        (when (eq (swift-mode:token:type name-token) 'identifier)
+              (hylo-mode:forward-token-or-list-except-curly-bracket))
+        (when (eq (hylo-mode:token:type name-token) 'identifier)
           (push
-           (swift-mode:declaration 'precedencegroup name-token nil)
+           (hylo-mode:declaration 'precedencegroup name-token nil)
            declarations)))))
     declarations))
 
-(defun swift-mode:forward-token-or-list-except-curly-bracket ()
+(defun hylo-mode:forward-token-or-list-except-curly-bracket ()
   "Move point to the end position of the next token or list.
 
 Curly brackets are not regarded as a list.
 Return the token skipped."
-  (let ((next-token (swift-mode:forward-token)))
-    (if (or (memq (swift-mode:token:type next-token) '(\( \[))
-            (equal (swift-mode:token:text next-token) "<"))
+  (let ((next-token (hylo-mode:forward-token)))
+    (if (or (memq (hylo-mode:token:type next-token) '(\( \[))
+            (equal (hylo-mode:token:text next-token) "<"))
         (progn
-          (goto-char (swift-mode:token:start next-token))
-          (swift-mode:forward-token-or-list))
+          (goto-char (hylo-mode:token:start next-token))
+          (hylo-mode:forward-token-or-list))
       next-token)))
 
-(defun swift-mode:scan-declarations:handle-struct-like (keyword-token)
+(defun hylo-mode:scan-declarations:handle-struct-like (keyword-token)
   "Parse struct-like declaration.
 
 Return a declaration if it have a name.  Return nil otherwise.
 KEYWORD-TOKEN is the keyword beginning the declaration like \"struct\" or
 \"enum\"."
   (let (next-token
-        (name-token (swift-mode:forward-token)))
-    (when (eq (swift-mode:token:type name-token) 'identifier)
+        (name-token (hylo-mode:forward-token)))
+    (when (eq (hylo-mode:token:type name-token) 'identifier)
       (while (progn
                (setq next-token
-                     (swift-mode:forward-token-or-list-except-curly-bracket))
-               (not (memq (swift-mode:token:type next-token)
+                     (hylo-mode:forward-token-or-list-except-curly-bracket))
+               (not (memq (hylo-mode:token:type next-token)
                           '(\; implicit-\; { } outside-of-buffer)))))
-      (when (and (eq (swift-mode:token:type next-token) 'implicit-\;)
+      (when (and (eq (hylo-mode:token:type next-token) 'implicit-\;)
                  (save-excursion
-                   (swift-mode:skip-whitespaces)
+                   (hylo-mode:skip-whitespaces)
                    (eq (char-after) ?\{)))
-        (setq next-token (swift-mode:forward-token)))
-      (swift-mode:declaration
-       (intern (swift-mode:token:text keyword-token))
+        (setq next-token (hylo-mode:forward-token)))
+      (hylo-mode:declaration
+       (intern (hylo-mode:token:text keyword-token))
        name-token
-       (when (eq (swift-mode:token:type next-token) '{)
-         (nreverse (swift-mode:scan-declarations)))))))
+       (when (eq (hylo-mode:token:type next-token) '{)
+         (nreverse (hylo-mode:scan-declarations)))))))
 
-(defun swift-mode:scan-declarations:handle-case-or-variable (type)
+(defun hylo-mode:scan-declarations:handle-case-or-variable (type)
   "Parse enum-case, let, or var.
 
 Return a list of declarations.
@@ -310,20 +310,20 @@ TYPE is one of `case', `let', or `var'."
         (items '()))
     (while
         (progn
-          (setq next-token (swift-mode:forward-token-or-list))
-          (when (eq (swift-mode:token:type next-token) 'identifier)
-            (push (swift-mode:declaration type next-token nil) items))
+          (setq next-token (hylo-mode:forward-token-or-list))
+          (when (eq (hylo-mode:token:type next-token) 'identifier)
+            (push (hylo-mode:declaration type next-token nil) items))
           (while
               (progn
-                (setq next-token (swift-mode:forward-token-or-list))
-                (not (memq (swift-mode:token:type next-token)
+                (setq next-token (hylo-mode:forward-token-or-list))
+                (not (memq (hylo-mode:token:type next-token)
                            '(\, \; implicit-\; } outside-of-buffer)))))
-          (eq (swift-mode:token:type next-token) '\,)))
-    (when (eq (swift-mode:token:type next-token) '})
-      (goto-char (swift-mode:token:start next-token)))
+          (eq (hylo-mode:token:type next-token) '\,)))
+    (when (eq (hylo-mode:token:type next-token) '})
+      (goto-char (hylo-mode:token:start next-token)))
     items))
 
-(defun swift-mode:scan-function-name-and-parameter-names ()
+(defun hylo-mode:scan-function-name-and-parameter-names ()
   "Parse function/macro name and parameter names.
 
 The point is assumed to be before a function/macro name.
@@ -335,7 +335,7 @@ and \"c\".
 
   func foo(a b: Int, c: Int)"
   (let* ((name-token
-          (swift-mode:forward-token-or-list-except-curly-bracket))
+          (hylo-mode:forward-token-or-list-except-curly-bracket))
          next-token
          parameter-end
          (parameter-names '())
@@ -345,78 +345,78 @@ and \"c\".
          (is-operator
           (funcall seq-contains-p
                    "/=-+!*%<>&|^~?."
-                   (elt (swift-mode:token:text name-token) 0))))
+                   (elt (hylo-mode:token:text name-token) 0))))
     (cond
-     ((eq (swift-mode:token:type name-token) 'identifier)
+     ((eq (hylo-mode:token:type name-token) 'identifier)
       (while (progn
                (setq next-token
-                     (swift-mode:forward-token-or-list-except-curly-bracket))
-               (not (memq (swift-mode:token:type next-token)
+                     (hylo-mode:forward-token-or-list-except-curly-bracket))
+               (not (memq (hylo-mode:token:type next-token)
                           '(\(\) \( { \; implicit-\; outside-of-buffer)))))
-      (if (eq (swift-mode:token:type next-token) '\(\))
+      (if (eq (hylo-mode:token:type next-token) '\(\))
           (progn
-            (setq parameter-end (swift-mode:token:end next-token))
-            (goto-char (swift-mode:token:start next-token))
-            (swift-mode:forward-token)
+            (setq parameter-end (hylo-mode:token:end next-token))
+            (goto-char (hylo-mode:token:start next-token))
+            (hylo-mode:forward-token)
 
             (while (< (point) parameter-end)
-              (setq next-token (swift-mode:forward-token))
+              (setq next-token (hylo-mode:forward-token))
 
-              (when (eq (swift-mode:token:type next-token) 'identifier)
+              (when (eq (hylo-mode:token:type next-token) 'identifier)
                 (when (or is-operator
-                          (and (equal (swift-mode:token:text name-token)
+                          (and (equal (hylo-mode:token:text name-token)
                                       "subscript")
-                               (eq (swift-mode:token:type
-                                    (swift-mode:forward-token-or-list))
+                               (eq (hylo-mode:token:type
+                                    (hylo-mode:forward-token-or-list))
                                    ':)))
-                  (setq next-token (swift-mode:token
+                  (setq next-token (hylo-mode:token
                                     'identifier
                                     "_"
-                                    (swift-mode:token:start next-token)
-                                    (swift-mode:token:end next-token))))
+                                    (hylo-mode:token:start next-token)
+                                    (hylo-mode:token:end next-token))))
                 (push next-token parameter-names))
 
               (while (and (< (point) parameter-end)
-                          (not (eq (swift-mode:token:type next-token) '\,)))
-                (setq next-token (swift-mode:forward-token-or-list))))
+                          (not (eq (hylo-mode:token:type next-token) '\,)))
+                (setq next-token (hylo-mode:forward-token-or-list))))
             (cons name-token (reverse parameter-names)))
         (list name-token)))
      (t nil))))
 
-(defun swift-mode:format-for-imenu:flat (declarations)
+(defun hylo-mode:format-for-imenu:flat (declarations)
   "Convert list of DECLARATIONS to alist for `imenu--index-alist'.
 
 Declarations are organized as trees."
   (seq-mapcat
    (lambda (declaration)
-     (let* ((name-token (swift-mode:declaration:name-token declaration))
-            (name (swift-mode:token:text name-token))
-            (position (swift-mode:token:start name-token))
-            (children (swift-mode:declaration:children declaration)))
+     (let* ((name-token (hylo-mode:declaration:name-token declaration))
+            (name (hylo-mode:token:text name-token))
+            (position (hylo-mode:token:start name-token))
+            (children (hylo-mode:declaration:children declaration)))
        (cons
         (cons name position)
         (mapcar
          (lambda (pair)
            (cons (concat name "." (car pair)) (cdr pair)))
-         (swift-mode:format-for-imenu:flat children)))))
+         (hylo-mode:format-for-imenu:flat children)))))
    declarations))
 
-(defun swift-mode:format-for-imenu:nested (declarations)
+(defun hylo-mode:format-for-imenu:nested (declarations)
   "Convert list of DECLARATIONS to alist for `imenu--index-alist'.
 
 Declarations are organized as a flat list of fully qualified names."
   (mapcar
    (lambda (declaration)
-     (let* ((name-token (swift-mode:declaration:name-token declaration))
-            (name (swift-mode:token:text name-token))
-            (position (swift-mode:token:start name-token))
-            (children (swift-mode:declaration:children declaration)))
+     (let* ((name-token (hylo-mode:declaration:name-token declaration))
+            (name (hylo-mode:token:text name-token))
+            (position (hylo-mode:token:start name-token))
+            (children (hylo-mode:declaration:children declaration)))
        (if children
            (cons name (cons (cons "self"  position)
-                            (swift-mode:format-for-imenu:nested children)))
+                            (hylo-mode:format-for-imenu:nested children)))
          (cons name position))))
    declarations))
 
-(provide 'swift-mode-imenu)
+(provide 'hylo-mode-imenu)
 
-;;; swift-mode-imenu.el ends here
+;;; hylo-mode-imenu.el ends here
