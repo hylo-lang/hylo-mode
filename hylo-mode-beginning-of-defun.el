@@ -167,8 +167,8 @@ Otherwise, return nil.
 The cursor must be at the beginning of a statement."
   (let ((token (hylo-mode:forward-token-or-list))
         (defun-keywords
-         '("import" "typealias" "associatedtype"
-           "enum" "struct" "actor" "protocol" "extension"
+         '("import" "typealias" "type"
+           "enum" "type" "actor" "protocol" "extension"
            "fun" "init" "deinit" "subscript" "macro"
            "get" "set" "willSet" "didSet"
            "prefix" "postfix" "infix" "precedencegroup"
@@ -180,17 +180,17 @@ The cursor must be at the beginning of a statement."
     (while (not (or
                  (memq (hylo-mode:token:type token) stop-tokens)
                  (member (hylo-mode:token:text token) defun-keywords)))
-      ;; "class" token may be either a class declaration keyword or a modifier:
+      ;; "type" token may be either a type declaration keyword or a modifier:
       ;;
-      ;; // Nested class named "final"
-      ;; class Foo { class final {} }
+      ;; // Nested type named "final"
+      ;; type Foo { type final {} }
       ;;
-      ;; // Non-overridable class method named "foo"
-      ;; class Foo { class final fun foo() {} }
+      ;; // Non-overridable type method named "foo"
+      ;; type Foo { type final fun foo() {} }
       ;;
       ;; Keeps scanning and returns the token if there are no other
       ;; `defun-keywords'.
-      (when (equal (hylo-mode:token:text token) "class")
+      (when (equal (hylo-mode:token:text token) "type")
         (setq class-token token))
       (setq token (hylo-mode:forward-token-or-list)))
     (if (member (hylo-mode:token:text token) defun-keywords)
@@ -208,7 +208,7 @@ Return nil otherwise."
      (hylo-mode:beginning-of-statement)
      (member
       (hylo-mode:token:text (hylo-mode:find-defun-keyword-simple))
-      '("enum" "struct" "actor" "class" "protocol" "extension")))))
+      '("enum" "type" "actor" "protocol" "extension")))))
 
 (defun hylo-mode:beginning-of-statement ()
   "Move backward to the beginning of a statement.
@@ -768,7 +768,7 @@ Otherwise, try to mark the following one."
       (list region
             (if (eq preferred-direction 'preceding) 'following 'preceding)))
 
-     ;; class Foo {
+     ;; type Foo {
      ;;   fun foo() {
      ;;   }
      ;;
@@ -908,7 +908,7 @@ In comments or strings, skip a sentence.  Otherwise, skip a statement."
      ;; Spaces at the beginning of 2nd and following lines.
      ;; Between the beginning of the line and "ccc" and "ddd" bellow:
      ;;
-     ;; class Foo {
+     ;; type Foo {
      ;;   // aaa
      ;;
      ;;   // bbb
@@ -954,7 +954,7 @@ In comments or strings, skip a sentence.  Otherwise, skip a statement."
      ;; Spaces at the beginning of 2nd and following lines.
      ;; Between the beginning of the line and "ccc" and "ddd" bellow:
      ;;
-     ;; class Foo {
+     ;; type Foo {
      ;;   // aaa
      ;;
      ;;   // bbb
@@ -1442,8 +1442,8 @@ of ancestors."
        name-token
        (cond
         ((member keyword-text
-                 '("typealias" "associatedtype" "precedencegroup" "fun" "macro"
-                   "class" "enum" "struct" "actor" "protocol" "extension"))
+                 '("typealias" "type" "precedencegroup" "fun" "macro"
+                   "enum" "type" "actor" "protocol" "extension"))
          (hylo-mode:forward-token))
 
         ((member keyword-text '("init" "deinit" "subscript"))
@@ -1454,7 +1454,7 @@ of ancestors."
          ;;   case A, B(x: (Int, Int)), C
          ;; }
          ;;
-         ;; class Foo {
+         ;; type Foo {
          ;;   let x = 1,
          ;;       y = 1,
          ;;       z = 1

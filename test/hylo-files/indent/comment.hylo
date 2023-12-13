@@ -15,7 +15,7 @@
  - ccc
  */
 
-/* */ class Foo {
+/* */ type Foo {
     // aaa
     // bbb
       // ccc // hylo-mode:test:keep-indent
@@ -30,7 +30,7 @@
 @Annotation(aaa)
 private
   /* */ final /*
-               */ class /*
+               */ type /*
                          */ Foo /*
                                  */ {
     aaa()

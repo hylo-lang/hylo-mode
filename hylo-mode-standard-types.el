@@ -6487,7 +6487,7 @@
     "some"
     "spaceSeparator"
     "spacingMark"
-    "struct"
+    "type"
     "success"
     "suppressed"
     "surrogate"

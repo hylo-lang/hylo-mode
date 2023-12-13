@@ -14,14 +14,14 @@ let foo:
 let foo
   :A = abc
 
-class Foo:
+type Foo:
   A
     .A,
   B, C,
   D {
 }
 
-class Foo
+type Foo
   : A
       .A,
     B, C,
@@ -29,14 +29,14 @@ class Foo
 }
 
 
-class Foo: A
+type Foo: A
              .A
          , B , C
          , D
 {
 }
 
-class Foo
+type Foo
   : A.
       A
   , B , C
@@ -64,28 +64,28 @@ let foo
   A =
   abc
 
-class Foo:
+type Foo:
   @A
   A
     .A,
   B {
 }
 
-class Foo
+type Foo
   : @A
     A
       .A,
     B {
 }
 
-class Foo: @A
+type Foo: @A
            A
              .A
          , B
 {
 }
 
-class Foo
+type Foo
   : @A
     A
       .A
@@ -103,7 +103,7 @@ let foo:
   /* */ A
   /* */ .B = abc
 
-class Foo:
+type Foo:
   A.
     B,
   A.
@@ -112,7 +112,7 @@ class Foo:
     .B {
 }
 
-class Foo
+type Foo
   : A.
       B,
     A.
@@ -121,7 +121,7 @@ class Foo
       .B {
 }
 
-class Foo: A.
+type Foo: A.
              B
          , A.
              B
@@ -130,7 +130,7 @@ class Foo: A.
 {
 }
 
-class Foo
+type Foo
   : A.
       B
   , A.

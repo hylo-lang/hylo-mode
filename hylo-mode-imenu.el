@@ -49,7 +49,7 @@ Values:
 (defun hylo-mode:declaration (type name-token children)
   "Construct and return a declaration.
 
-TYPE is the type of the declaration such as `class' or `struct'.
+TYPE is the type of the declaration such as `fun' or `type'.
 NAME-TOKEN is the name token of the declaration.  For declarations like `init',
 it is the keyword token itself.
 CHILDREN is the child declarations if exists."
@@ -118,20 +118,20 @@ Return found declarations in reverse order."
       (setq next-text (hylo-mode:token:text next-token))
       (cond
        ((equal next-text "import")
-        ;; Skips an import kind, for example, "class" token below:
+        ;; Skips an import kind, for example, "type" token below:
         ;;
-        ;; import class Foo.Bar
+        ;; import type Foo.Bar
         (hylo-mode:forward-token-or-list-except-curly-bracket))
 
-       ((equal next-text "class")
-        ;; "class" token may be either a class declaration keyword or a
+       ((equal next-text "type")
+        ;; "type" token may be either a type declaration keyword or a
         ;; modifier:
         ;;
-        ;; // Nested class named "final"
-        ;; class Foo { class final {} }
+        ;; // Nested type named "final"
+        ;; type Foo { type final {} }
         ;;
-        ;; // Non-overridable class method named "foo"
-        ;; class Foo { class final fun foo() {} }
+        ;; // Non-overridable type method named "foo"
+        ;; type Foo { type final fun foo() {} }
         ;;
         ;; So delays until "{" token.
         (setq last-class-token next-token))
@@ -140,7 +140,7 @@ Return found declarations in reverse order."
         (when (memq next-type '(} outside-of-buffer))
           (setq done t))
         (cond
-         ;; Having pending "class" token
+         ;; Having pending "type" token
          (last-class-token
           (save-excursion
             (goto-char (hylo-mode:token:end last-class-token))
@@ -163,10 +163,10 @@ Return found declarations in reverse order."
          ;; Ignores the token otherwise.
          ))
 
-       ((member next-text '("struct" "protocol" "extension" "enum" "actor"))
+       ((member next-text '("type" "protocol" "extension" "enum" "actor"))
         (setq last-class-token nil)
         (let ((declaration
-               (hylo-mode:scan-declarations:handle-struct-like next-token)))
+               (hylo-mode:scan-declarations:handle-type-like next-token)))
           (when declaration
             (push declaration declarations))))
 
@@ -176,7 +176,7 @@ Return found declarations in reverse order."
                (hylo-mode:scan-declarations:handle-case-or-variable 'case)))
           (setq declarations (append case-declarations declarations))))
 
-       ((member next-text '("typealias" "associatedtype"))
+       ((member next-text '("typealias" "type"))
         (setq last-class-token nil)
         (setq name-token
               (hylo-mode:forward-token-or-list-except-curly-bracket))
@@ -257,11 +257,11 @@ Return the token skipped."
           (hylo-mode:forward-token-or-list))
       next-token)))
 
-(defun hylo-mode:scan-declarations:handle-struct-like (keyword-token)
-  "Parse struct-like declaration.
+(defun hylo-mode:scan-declarations:handle-type-like (keyword-token)
+  "Parse type-like declaration.
 
 Return a declaration if it have a name.  Return nil otherwise.
-KEYWORD-TOKEN is the keyword beginning the declaration like \"struct\" or
+KEYWORD-TOKEN is the keyword beginning the declaration like \"type\" or
 \"enum\"."
   (let (next-token
         (name-token (hylo-mode:forward-token)))

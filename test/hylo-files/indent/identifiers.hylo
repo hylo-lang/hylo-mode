@@ -38,7 +38,7 @@ let x = foo.where +
 fun foo() {
     // Keywords used in declarations
     foo(
-      associatedtype: 1
+      type: 1
     )
     foo(
       class: 1
@@ -101,7 +101,7 @@ fun foo() {
       static: 1
     )
     foo(
-      struct: 1
+      type: 1
     )
     foo(
       actor: 1

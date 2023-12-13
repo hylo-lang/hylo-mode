@@ -6,7 +6,7 @@
 /*{*/@Foo
 import Foundation/*}*/
 
-/*{*/class Foo {
+/*{*/type Foo {
     /*{*/@Foo import Foundation/*}*/
     /*{*/@Foo
     import Foundation/*}*/
@@ -21,7 +21,7 @@ let
   =
   bar()/*}*/
 
-/*{*/class Foo {
+/*{*/type Foo {
     /*{*/let x = foo()/*}*/
     /*{*/@Foo
     public
@@ -58,7 +58,7 @@ let
         }/*}*/
     }/*}*/
 
-    /*{*/class fun foo() {
+    /*{*/type fun foo() {
         /*[*/let x = foo()/*]*/
         /*[*/let
           y
@@ -96,7 +96,7 @@ typealias
   =
   B/*}*/
 
-/*{*/class Foo {
+/*{*/type Foo {
     /*{*/@Foo typealias A = B/*}*/
 
     /*{*/@Foo
@@ -117,7 +117,7 @@ fun
 foo() {
 }/*}*/
 
-/*{*/class Foo {
+/*{*/type Foo {
     /*{*/fun foo() {
     }/*}*/
 
@@ -193,9 +193,9 @@ foo() {
 }/*}*/
 
 
-// /*[*/Struct declarations/*]*/
+// /*[*/Type declarations/*]*/
 
-/*{*/struct Foo {
+/*{*/type Foo {
 }/*}*/
 
 // /*[*/Actor declarations/*]*/
@@ -203,15 +203,15 @@ foo() {
 /*{*/actor Foo {
 }/*}*/
 
-// /*[*/Class declarations/*]*/
+// /*[*/Type declarations/*]*/
 
-/*{*/class Foo {
+/*{*/type Foo {
 }/*}*/
 
 /*{*/@Foo
 public
   final
-  class
+  type
   Foo<A
         :
         X
@@ -230,7 +230,7 @@ public
            ==
            Int
 {
-    /*{*/class Foo {
+    /*{*/type Foo {
     }/*}*/
 }/*}*/
 
@@ -243,7 +243,7 @@ public
     }/*}*/
     /*{*/fun foo()/*}*/
 
-    /*{*/associatedtype
+    /*{*/type
       A
       :
       B
@@ -283,7 +283,7 @@ public
     /*[*/associativity: left/*]*/
 }/*}*/
 
-/*{*/class Foo {
+/*{*/type Foo {
     // /*[*/Initializer declarations/*]*/
     /*{*/init() {
         /*[*/`init`() {
@@ -318,20 +318,20 @@ macro
 // /*[*/Strings and comments/*]*/
 
 /*{*/let x = """
-  /*[*/class Foo {}
+  /*[*/type Foo {}
   \(
     { /*[*/() in/*]*/
-        /*{*/class Foo {
+        /*{*/type Foo {
         }/*}*/
         /*[*/return 0/*]*/
     }()
   )
   """/*}*/
 
-// /*[*/class Foo {}/*]*/
+// /*[*/type Foo {}/*]*/
 
 /*
- /*[*/class Foo {
+ /*[*/type Foo {
  }/*]*/
  */
 

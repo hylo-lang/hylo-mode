@@ -9,11 +9,11 @@ import
   Foo
 
 import
-  class
+  type
   Foo
   .Bar
 
-import class
+import type
   Foo
 
 import
@@ -45,7 +45,7 @@ let
   bar
   .baz
 
-class Foo {
+type Foo {
     @ABC
     open
       weak
@@ -128,7 +128,7 @@ class Foo {
 
 // Variable declarations
 
-class Foo {
+type Foo {
     internal var x = foo
       .foo
       .foo,
@@ -313,7 +313,7 @@ class Foo {
 
 // Type alias declaration
 
-class Foo {
+type Foo {
     typealias A<B> = C
       .D
 
@@ -568,12 +568,12 @@ enum Foo
 {
 }
 
-// Struct declarations
+// Type declarations
 // See also types.hylo
 
 @A
 fileprivate
-  struct
+  type
   Foo<A, B>
   : Bar<A, B>,
     Baz<A, B>,
@@ -590,7 +590,7 @@ fileprivate
 
 @A
 @B
-struct A {
+type A {
     fun foo() {
     }
     fun foo() {
@@ -599,52 +599,52 @@ struct A {
 
 @A(a)
 @B(b)
-struct A {
+type A {
     fun foo() {
     }
     fun foo() {
     }
 }
 
-struct Foo<
+type Foo<
   A: A,
   A: A, A: A
 > {
 }
 
-struct Foo<
+type Foo<
   A: A,
   A: A, A: A> {
 }
 
-struct Foo<A: A,
+type Foo<A: A,
            A: A, A: A> {
 }
 
-struct Foo<A: A,
+type Foo<A: A,
            A: A, A: A
 > {
 }
 
-struct Foo
+type Foo
   <
     A: A,
     A: A, A: A
   > {
 }
 
-struct Foo
+type Foo
   <
     A: A,
     A: A, A: A> {
 }
 
-struct Foo
+type Foo
   <A: A,
    A: A, A: A> {
 }
 
-struct Foo
+type Foo
   <A: A,
    A: A, A: A
   > {
@@ -707,7 +707,7 @@ protocol Foo {
           throws
         set
     }
-    associatedtype AAA = BBB
+    type AAA = BBB
     convenience
       init(x: Int, y, Int)
     var foo: Int {
@@ -748,9 +748,9 @@ precedencegroup
 
 // Declaration modifiers
 
-class Foo {
+type Foo {
     open
-      class
+      type
       mutating
       nonmutating
       fun
@@ -761,7 +761,7 @@ class Foo {
       (
         set
       )
-      class
+      type
       dynamic
       final
       lazy
@@ -782,21 +782,21 @@ class Foo {
       x = 1
 
     internal
-      class
+      type
       let
       x = 1
 
     fileprivate
-      class
+      type
       init() {
     }
 
     private
-      class
+      type
       deinit {
     }
 
-    class
+    type
       subscript(foo: Int) -> Int {
         return foo
     }

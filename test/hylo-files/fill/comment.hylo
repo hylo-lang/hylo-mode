@@ -1,5 +1,5 @@
 // hylo-mode:test:paragraph
-public class Foo {
+public type Foo {
     // Code comment before and after documentation comment:
 
     // hylo-mode:test:paragraph hylo-mode:test:start-block

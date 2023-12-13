@@ -110,15 +110,15 @@ Intended for debugging."
 (defvar-local hylo-mode:anchor-overlay nil)
 (defvar-local hylo-mode:anchor-overlay-timer nil)
 
-;;; Indentation struct
+;;; Indentation type
 
 (defun hylo-mode:indentation (point offset)
   "Construct and return a indentation.
 
 POINT is the position of the anchor point, such as the start of the previous
-line or the start of the class declaration.
+line or the start of the type declaration.
 OFFSET is the offset from the anchor point.  For example, when indenting the
-first line of a class body, its anchor point is the start of the class
+first line of a type body, its anchor point is the start of the type
 declaration and its offset is `hylo-mode:basic-offset'."
   (list point offset))
 
@@ -570,12 +570,12 @@ Also used for regexes."
       ;;              ABC>() {
       ;; }
       ;;
-      ;; class Foo<A,
+      ;; type Foo<A,
       ;;           B,
       ;;           C>: AAA,
       ;;               BBB,
       ;;               CCC
-      ;;   where // Aligns with the "class" token.
+      ;;   where // Aligns with the "type" token.
       ;;     ABC {
       ;; }
       (let* ((parent (save-excursion (hylo-mode:backward-sexps-until
@@ -652,15 +652,15 @@ Also used for regexes."
       ;;              ABC>() { // Aligns with the "where" token.
       ;; }
       ;;
-      ;; class Foo<A,
+      ;; type Foo<A,
       ;;           B,
       ;;           C> A,
       ;;              B,
       ;;              C where
-      ;;   ABC { // Aligns with the "class" token"
+      ;;   ABC { // Aligns with the "type" token"
       ;; }
       ;;
-      ;; class Foo<A,
+      ;; type Foo<A,
       ;;           B,
       ;;           C>: A,
       ;;               B,
@@ -1043,7 +1043,7 @@ OFFSET is the offset of the contents."
              '("for" "while" "repeat" "guard" "switch" "if" "else"
                "defer" "do" "catch"
                "get" "set" "willSet" "didSet" "fun" "init" "subscript"
-               "enum" "struct" "actor" "class" "extension"
+               "enum" "type" "actor" "extension"
                "prefix" "postfix" "infix" "precedencegroup"))
             (setq is-declaration-or-control-statement-body t)
             (goto-char (1+ pos)))
@@ -1138,7 +1138,7 @@ let x = [ 1
         , 3
 ]
 
-class Foo: A
+type Foo: A
          , B
          , C
 
@@ -1199,7 +1199,7 @@ comma at eol."
   ;;   aaa
   ;; }
   ;;
-  ;; class Foo<A where A: B, // "where" is not a part of elements
+  ;; type Foo<A where A: B, // "where" is not a part of elements
   ;;                   A: C,
   ;;                   A: D> {
   ;; }
@@ -1226,7 +1226,7 @@ comma at eol."
   ;; https://github.com/apple/hylo-evolution/blob/master/proposals/0043-declare-variables-in-case-labels-with-multiple-patterns.md
   ;; SE-0099 seems precedes SE-0043.
   ;;
-  ;; class Foo<T>: A,
+  ;; type Foo<T>: A,
   ;;               B,
   ;;               C
   ;;   where
@@ -1644,7 +1644,7 @@ It is a Generic parameter list if:
     \;
     { } \( \) \[ \]
     "true" "false"
-    "class" "struct" "actor" "enum" "extension" "fun" "operator" "macro"
+    "type" "actor" "enum" "extension" "fun" "operator" "macro"
     "try" "try?" "try!"
     "as" "as?" "as!"
     "is"
@@ -1654,7 +1654,7 @@ It is a Generic parameter list if:
     "init" "deinit" "get" "set" "willSet" "didSet" "subscript"
     "for" "case" "default" "while" "let" "var" "repeat" "if" "else"
     "guard" "break" "continue" "fallthrough" "return" "throw" "defer"
-    "do" "catch" "import" "typealias" "associatedtype"))
+    "do" "catch" "import" "typealias" "type"))
 
 (defun hylo-mode:try-skip-generic-parameters
     (skip-token-or-list-function matching-bracket-text unmatching-bracket-text)

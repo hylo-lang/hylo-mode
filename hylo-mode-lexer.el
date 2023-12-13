@@ -693,8 +693,8 @@ return non-nil."
 
      ;; Suppress implicit semicolon after declaration starters.
      ((member (hylo-mode:token:text previous-token)
-              '("class" "struct" "actor" "protocol" "enum" "extension" "fun"
-                "typealias" "associatedtype" "precedencegroup" "operator"
+              '("type" "actor" "protocol" "enum" "extension" "fun"
+                "typealias" "type" "precedencegroup" "operator"
                 "macro"))
       nil)
 
@@ -765,8 +765,8 @@ return non-nil."
      ;;
      ;; `protocol' is handled by the next rule
      ((member (hylo-mode:token:text next-token)
-              '("class" "struct" "actor" "enum" "extension" "fun" "typealias"
-                "associatedtype" "precedencegroup" "macro"))
+              '("type" "actor" "enum" "extension" "fun" "typealias"
+                "type" "precedencegroup" "macro"))
       t)
 
      ;; Inserts implicit semicolon before protocol unless it is followed by <.
@@ -867,9 +867,9 @@ Return nil otherwise."
 That is supertype declaration or type declaration of let or var."
   (save-excursion
     (let ((previous-token (hylo-mode:backward-token-simple)))
-      ;; class Foo<T>: Bar ← supertype colon
-      ;; class Foo<T> : Bar ← supertype colon
-      ;; class Foo<T where T: Bar<[(Int, String)]>> : Bar ← supertype colon
+      ;; type Foo<T>: Bar ← supertype colon
+      ;; type Foo<T> : Bar ← supertype colon
+      ;; type Foo<T where T: Bar<[(Int, String)]>> : Bar ← supertype colon
       ;; case Foo: ← not a supertype colon
       ;; case Foo where foo: ← not a supertype colon
       ;; case let Foo(x) where x is Foo<Int>: ← not a supertype colon
@@ -881,23 +881,23 @@ That is supertype declaration or type declaration of let or var."
       ;; ]
       ;; foo(bar, baz: baz) ← not a supertype colon
       ;; protocol Foo {
-      ;;   associatedtype Bar<A>: Baz ← supertype colon
+      ;;   type Bar<A>: Baz ← supertype colon
       ;; }
       (or
        ;; FIXME case let Foo(x) where x is Foo<Int>
        (eq (hylo-mode:token:type previous-token) '>)
-       ;; class Foo: ← supertype colon
+       ;; type Foo: ← supertype colon
        ;; extension Foo: ← supertype colon
        ;; let foo: ← not a supertype colon
        ;; var foo: ← not a supertype colon
        ;; protocol Foo {
-       ;;   associatedtype Bar: Baz ← supertype colon
+       ;;   type Bar: Baz ← supertype colon
        ;; }
        (member (hylo-mode:token:text
                 (hylo-mode:backquote-identifier-if-after-dot
                  (hylo-mode:backward-token-simple)))
-               '("class" "extension" "enum" "struct" "actor" "protocol"
-                 "typealias" "associatedtype"))))))
+               '("extension" "enum" "type" "actor" "protocol"
+                 "typealias" "type"))))))
 
 (defvar hylo-mode:in-recursive-call-of-case-colon-p nil
   "Non-nil if `case-colon-p' is being evaluated.")
@@ -949,7 +949,7 @@ Return nil otherwise."
     (or (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
                 '("init" "subscript"))
         (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
-                '("typealias" "fun" "enum" "struct" "actor" "class" "init"
+                '("typealias" "fun" "enum" "type" "actor" "init"
                   "macro")))))
 
 (defun hylo-mode:fix-operator-type (token)

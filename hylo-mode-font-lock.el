@@ -198,7 +198,7 @@ This function does not search beyond LIMIT."
     (concat
      "\\<\\("
      (string-join
-      '("fun" "enum" "struct" "class" "protocol" "extension" "actor" "macro")
+      '("fun" "enum" "type" "protocol" "extension" "actor" "macro")
       "\\|")
      "\\)\\>"))))
 
@@ -360,7 +360,7 @@ The predicate MATCH-P is called with two arguments:
 (defun hylo-mode:font-lock-match-declared-function-names (limit)
   "Move the cursor just after a function name or others.
 
-Others includes enum, struct, class, protocol, and extension name.
+Others includes enum, type, protocol, and extension name.
 Set `match-data', and return t if a function name or others found before
 position LIMIT.
 Return nil otherwise."
@@ -520,9 +520,9 @@ Return nil otherwise."
   "Keywords used as constants.")
 
 (defconst hylo-mode:declaration-keywords
-  '("associatedtype" "class" "deinit" "enum" "extension" "fileprivate" "fun"
+  '("type" "deinit" "enum" "extension" "fileprivate" "fun"
     "import" "init" "inout" "internal" "let" "open" "operator" "package"
-    "private" "protocol" "public" "any" "some" "static" "struct" "subscript"
+    "private" "protocol" "public" "any" "some" "static" "type" "subscript"
     "typealias" "var" "actor" "nonisolated" "isolated" "distributed"
     "borrowing" "consuming" "macro")
   "Keywords used in declarations.")

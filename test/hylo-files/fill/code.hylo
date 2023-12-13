@@ -1,4 +1,4 @@
-public class Foo {
+public type Foo {
     fun foo() {
         print("Code should not affected by fill-region")
     }
