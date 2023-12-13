@@ -71,20 +71,20 @@ public class Foo {
     // Code and comments
 
     /// hylo-mode:test:paragraph
-    func foo() {}
+    fun foo() {}
 
     /// hylo-mode:test:paragraph
-    func foo() {}
+    fun foo() {}
 
     /**
      hylo-mode:test:paragraph
      */
-    func foo() {}
+    fun foo() {}
 
     /**
      hylo-mode:test:paragraph
      */
-    func foo() {}
+    fun foo() {}
 
 
     // CommonMark

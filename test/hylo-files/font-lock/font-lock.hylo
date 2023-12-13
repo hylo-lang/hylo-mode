@@ -56,7 +56,7 @@ foo +!+!+!+!+ bbb // "foo +!+!+!+!+ bbb"
 
 enum Foo: Error { .foo } // #("enum Foo: Error { .foo }" 0 4 (face hylo-mode:keyword-face) 5 8 (face hylo-mode:function-name-face) 10 15 (face hylo-mode:builtin-type-face) 19 22 (face hylo-mode:property-access-face))
 
-func foo() { // #("func foo() {" 0 4 (face hylo-mode:keyword-face) 5 8 (face hylo-mode:function-name-face))
+fun foo() { // #("fun foo() {" 0 4 (face hylo-mode:keyword-face) 5 8 (face hylo-mode:function-name-face))
     foo() // #("    foo()" 4 7 (face hylo-mode:function-call-face))
 }
 

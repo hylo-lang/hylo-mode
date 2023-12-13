@@ -564,7 +564,7 @@ Also used for regexes."
       ;;           where // Aligns with the pattern.
       ;;             aaa
       ;;
-      ;; func foo<A: AAA,
+      ;; fun foo<A: AAA,
       ;;          B: BBB
       ;;            where // Aligns with the start of the type parameters.
       ;;              ABC>() {
@@ -641,12 +641,12 @@ Also used for regexes."
       ;;
       ;;
       ;;
-      ;; func foo<A: AAA,
+      ;; fun foo<A: AAA,
       ;;          B: BBB where
       ;;            ABC>() { // Aligns with the start of the type parameters.
       ;; }
       ;;
-      ;; func foo<A: AAA,
+      ;; fun foo<A: AAA,
       ;;          B: BBB
       ;;            where
       ;;              ABC>() { // Aligns with the "where" token.
@@ -1042,7 +1042,7 @@ OFFSET is the offset of the contents."
              (hylo-mode:token:text next-token)
              '("for" "while" "repeat" "guard" "switch" "if" "else"
                "defer" "do" "catch"
-               "get" "set" "willSet" "didSet" "func" "init" "subscript"
+               "get" "set" "willSet" "didSet" "fun" "init" "subscript"
                "enum" "struct" "actor" "class" "extension"
                "prefix" "postfix" "infix" "precedencegroup"))
             (setq is-declaration-or-control-statement-body t)
@@ -1242,7 +1242,7 @@ comma at eol."
   ;;     Generator.Element: C {
   ;; }
   ;;
-  ;; func foo<T> -> Int
+  ;; fun foo<T> -> Int
   ;;   where
   ;;     T: A,
   ;;     T: B,
@@ -1644,7 +1644,7 @@ It is a Generic parameter list if:
     \;
     { } \( \) \[ \]
     "true" "false"
-    "class" "struct" "actor" "enum" "extension" "func" "operator" "macro"
+    "class" "struct" "actor" "enum" "extension" "fun" "operator" "macro"
     "try" "try?" "try!"
     "as" "as?" "as!"
     "is"

@@ -1,5 +1,5 @@
 public class Foo {
-    func foo() {
+    fun foo() {
         print("Code should not affected by fill-region")
     }
 }

@@ -7,7 +7,7 @@ import enum FooModule3.ImportedEnum
 import protocol FooModule3.ImportedProtocol
 import let FooModule3.importedConstant
 import var FooModule3.importedVariable
-import func FooModule3.importedFunction
+import fun FooModule3.importedFunction
 
 // Note that `import actor` is invalid (at least with Hylo 5.5).
 
@@ -44,21 +44,21 @@ import func FooModule3.importedFunction
 
     @AAA internal typealias TypeAlias<A: AA, B: BB, C: CC> = AAA
 
-    @AAA class final func function1<A: AA, B: BB, C: CC>(aaa bbb: Int, _ ccc: Int, ddd: Int = 1, eee: inout Int = 2) async throws -> AAA {
+    @AAA class final fun function1<A: AA, B: BB, C: CC>(aaa bbb: Int, _ ccc: Int, ddd: Int = 1, eee: inout Int = 2) async throws -> AAA {
         let a = 1
         var b = 2
 
         return AAA()
     }
-    @AAA class final func function2() rethrows -> AAA {
+    @AAA class final fun function2() rethrows -> AAA {
         return AAA()
     }
-    @AAA class final func function3(a: Int...) rethrows -> AAA {
+    @AAA class final fun function3(a: Int...) rethrows -> AAA {
         return AAA()
     }
 
     // Argument labels of operators are always "_"
-    @AAA class final func + <A: AA, B: BB, C: CC>(lhs: FooClass1<A, B, C>, rhs: Int) rethrows -> AAA {
+    @AAA class final fun + <A: AA, B: BB, C: CC>(lhs: FooClass1<A, B, C>, rhs: Int) rethrows -> AAA {
         return AAA()
     }
 
@@ -99,7 +99,7 @@ actor FooActor: AAA {
 
 protocol FooProtocol: AAA {
     var protocolProperty: Int { get set}
-    func protocolMethod(a: Int, b: Int) -> Int
+    fun protocolMethod(a: Int, b: Int) -> Int
     init(a: Int, b: Int, c d: Int)
     subscript<A: AA, B: BB, C: CC>(aaa: Int, bbb ccc: Int) -> AAA
     associatedtype AssociatedType: AAA

@@ -745,18 +745,18 @@ let a = if
     bar()
 }
 
-func foo() -> Int {
+fun foo() -> Int {
     return if x { bar() }
       else { baz() }
 }
 
-func foo() -> Int {
+fun foo() -> Int {
     return
       if x { bar() }
       else { baz() }
 }
 
-func foo() -> Int {
+fun foo() -> Int {
     return
       if x {
           bar()
@@ -766,7 +766,7 @@ func foo() -> Int {
       }
 }
 
-func foo() -> Int {
+fun foo() -> Int {
     return if x {
         bar()
     }
@@ -803,7 +803,7 @@ default:
     foo()
 }
 
-func foo() {
+fun foo() {
     return switch x {
     case 1:
         1
@@ -812,7 +812,7 @@ func foo() {
     }
 }
 
-func foo() {
+fun foo() {
     return
       switch x {
       case 1:
@@ -825,7 +825,7 @@ func foo() {
 // consume operator
 // https://github.com/apple/hylo-evolution/blob/main/proposals/0366-move-function.md
 
-func foo() {
+fun foo() {
     // consume operator cannot be followed by a line break.
     let y =
       consume
@@ -838,7 +838,7 @@ func foo() {
 // copy operator
 // https://github.com/apple/hylo-evolution/blob/main/proposals/0377-parameter-ownership-modifiers.md
 
-func foo() {
+fun foo() {
     // copy operator cannot be followed by a line break.
     copy
     x
@@ -848,7 +848,7 @@ func foo() {
 // discard self
 // https://github.com/apple/hylo-evolution/blob/main/proposals/0390-noncopyable-structs-and-enums.md
 
-func foo() {
+fun foo() {
     // discard operator cannot be followed by a line break.
     discard
     self

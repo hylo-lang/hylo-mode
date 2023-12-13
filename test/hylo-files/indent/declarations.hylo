@@ -26,11 +26,11 @@ import
   bar
 
 import
-  func
+  fun
   Foo.+
 
 import
-  func
+  fun
   Foo
   .+
 
@@ -373,7 +373,7 @@ class Foo {
 @A
 private
   final
-  func
+  fun
   foo<A,
       B>
   (
@@ -406,7 +406,7 @@ private
     foo()
 }
 
-func
+fun
   foo()
   ->
   @A
@@ -415,7 +415,7 @@ func
     foo()
 }
 
-func
+fun
   foo()
   ->
   @A(aaa)
@@ -424,7 +424,7 @@ func
     foo()
 }
 
-func foo<
+fun foo<
   A: A,
   A: A, A: A
 > (
@@ -433,19 +433,19 @@ func foo<
 ){
 }
 
-func foo<
+fun foo<
   A: A,
   A: A, A: A> (
   a: A,
   a: A) {
 }
 
-func foo<A: A,
+fun foo<A: A,
          A: A, A: A> (a: A,
                       a: A) {
 }
 
-func foo<A: A,
+fun foo<A: A,
          A: A, A: A
 > (
   a: A,
@@ -453,7 +453,7 @@ func foo<A: A,
 ) {
 }
 
-func foo
+fun foo
   <
     A: A,
     A: A, A: A
@@ -464,7 +464,7 @@ func foo
   ){
 }
 
-func foo
+fun foo
   <
     A: A,
     A: A, A: A>
@@ -473,14 +473,14 @@ func foo
     a: A) {
 }
 
-func foo
+fun foo
   <A: A,
    A: A, A: A>
   (a: A,
    a: A) {
 }
 
-func foo
+fun foo
   <A: A,
    A: A, A: A
   >
@@ -520,7 +520,7 @@ fileprivate
       G,
       H
 
-    func foo() {
+    fun foo() {
     }
 
     case I
@@ -550,7 +550,7 @@ fileprivate
          F
            = 3
 
-    func foo() {
+    fun foo() {
     }
 }
 
@@ -583,26 +583,26 @@ fileprivate
       C,
     B =
       D<E> {
-    func foo()
-    func foo()
+    fun foo()
+    fun foo()
 }
 
 
 @A
 @B
 struct A {
-    func foo() {
+    fun foo() {
     }
-    func foo() {
+    fun foo() {
     }
 }
 
 @A(a)
 @B(b)
 struct A {
-    func foo() {
+    fun foo() {
     }
-    func foo() {
+    fun foo() {
     }
 }
 
@@ -664,9 +664,9 @@ fileprivate
       C,
     B =
       D<E> {
-    func foo()
+    fun foo()
     nonisolated
-      func foo()
+      fun foo()
 }
 
 @A
@@ -674,12 +674,12 @@ distributed
   actor
   Foo {
     distributed
-      func
+      fun
       foo() {
     }
 
     distributed
-      func
+      fun
       foo() {
     }
 
@@ -695,9 +695,9 @@ distributed
 // Protocol declarations
 
 protocol Foo {
-    func foo(x: Int, y: Int) throws -> (A, B)
-    func bar(x: Int) throws
-    func baz(x: () throws -> Int) rethrows
+    fun foo(x: Int, y: Int) throws -> (A, B)
+    fun bar(x: Int) throws
+    fun baz(x: () throws -> Int) rethrows
     init<A, B>(x: Int) throws
       where
         A: C
@@ -753,7 +753,7 @@ class Foo {
       class
       mutating
       nonmutating
-      func
+      fun
       foo() {
     }
 
@@ -802,13 +802,13 @@ class Foo {
     }
 
     package
-      func foo() {
+      fun foo() {
     }
 }
 
 // async let
 
-func foo(f: @escaping (Int, Int) async -> Int, t: (Int, Int)) async {
+fun foo(f: @escaping (Int, Int) async -> Int, t: (Int, Int)) async {
     let a = f as (Int, Int)
       async
       ->
@@ -845,7 +845,7 @@ var
     return Bar()
 }
 
-func foo()
+fun foo()
   ->
   some
   Foo {
@@ -857,7 +857,7 @@ func foo()
 // https://github.com/apple/hylo-evolution/blob/main/proposals/0393-parameter-packs.md#introduction
 // https://github.com/apple/hylo-evolution/blob/main/proposals/0398-variadic-types.md
 
-func constrain<each S: Sequence>(
+fun constrain<each S: Sequence>(
   _: repeat
     each // hylo-mode:test:known-bug
     S // hylo-mode:test:known-bug

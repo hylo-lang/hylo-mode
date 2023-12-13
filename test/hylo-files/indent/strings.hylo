@@ -3,7 +3,7 @@
 // hylo-mode:test:eval (setq-local hylo-mode:multiline-statement-offset 2)
 // hylo-mode:test:eval (setq-local hylo-mode:switch-case-offset 0)
 
-func f() {
+fun f() {
     let x = """
       aaa
       "

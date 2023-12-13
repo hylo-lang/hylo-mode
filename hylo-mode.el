@@ -234,7 +234,7 @@ Signal `scan-error' if it hits opening parentheses."
 
   (delete-overlay hylo-mode:anchor-overlay)
 
-  (add-hook 'which-func-functions
+  (add-hook 'which-fun-functions
             (lambda ()
               (when (equal (with-current-buffer (current-buffer) major-mode)
                            'hylo-mode)

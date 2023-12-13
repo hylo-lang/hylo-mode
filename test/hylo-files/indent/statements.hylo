@@ -717,7 +717,7 @@ else {
 
 // Inner scope guard
 
-func main() {
+fun main() {
     guard foo else {
         bar()
     }
@@ -1254,7 +1254,7 @@ do {
 
 // Conditional control statements
 
-func foo() {
+fun foo() {
     #if foo
     foo()
     foo()

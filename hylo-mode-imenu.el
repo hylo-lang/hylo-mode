@@ -131,7 +131,7 @@ Return found declarations in reverse order."
         ;; class Foo { class final {} }
         ;;
         ;; // Non-overridable class method named "foo"
-        ;; class Foo { class final func foo() {} }
+        ;; class Foo { class final fun foo() {} }
         ;;
         ;; So delays until "{" token.
         (setq last-class-token next-token))
@@ -185,9 +185,9 @@ Return found declarations in reverse order."
            (hylo-mode:declaration (intern next-text) name-token nil)
            declarations)))
 
-       ((member next-text '("func" "init" "subscript" "macro"))
+       ((member next-text '("fun" "init" "subscript" "macro"))
         (setq last-class-token nil)
-        (unless (member next-text '("func" "macro"))
+        (unless (member next-text '("fun" "macro"))
           (goto-char (hylo-mode:token:start next-token)))
         (let ((declaration-type (intern next-text))
               (names (hylo-mode:scan-function-name-and-parameter-names)))
@@ -333,7 +333,7 @@ Return tokens of function/macro names and parameter names.
 For example, given the following code, this return tokens \"foo\", \"a\",
 and \"c\".
 
-  func foo(a b: Int, c: Int)"
+  fun foo(a b: Int, c: Int)"
   (let* ((name-token
           (hylo-mode:forward-token-or-list-except-curly-bracket))
          next-token

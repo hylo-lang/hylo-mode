@@ -46,13 +46,13 @@
 
 Suppose the following code with the point located at A:
 
-    func outer() {
-      func inner1() {
+    fun outer() {
+      fun inner1() {
       }
 
       // A
 
-      func inner2() {
+      fun inner2() {
       }
     }
 
@@ -169,7 +169,7 @@ The cursor must be at the beginning of a statement."
         (defun-keywords
          '("import" "typealias" "associatedtype"
            "enum" "struct" "actor" "protocol" "extension"
-           "func" "init" "deinit" "subscript" "macro"
+           "fun" "init" "deinit" "subscript" "macro"
            "get" "set" "willSet" "didSet"
            "prefix" "postfix" "infix" "precedencegroup"
            "var" "let"
@@ -186,7 +186,7 @@ The cursor must be at the beginning of a statement."
       ;; class Foo { class final {} }
       ;;
       ;; // Non-overridable class method named "foo"
-      ;; class Foo { class final func foo() {} }
+      ;; class Foo { class final fun foo() {} }
       ;;
       ;; Keeps scanning and returns the token if there are no other
       ;; `defun-keywords'.
@@ -233,12 +233,12 @@ Intended for internal use."
 
     ;; We have three cases:
     ;;
-    ;; func foo() {
+    ;; fun foo() {
     ;; }
     ;;
     ;; // A
     ;;
-    ;; /* B */ func /* C */ bar() {
+    ;; /* B */ fun /* C */ bar() {
     ;; }
     (cond
      ((or (< pos (point))
@@ -473,7 +473,7 @@ Intended for internal use."
   "Return t if TOKEN is an implicit semicolon not at end of a statement.
 
 Return nil otherwise."
-  ;; func foo() // implicit semicolon here
+  ;; fun foo() // implicit semicolon here
   ;; {
   ;; }
   ;;
@@ -733,7 +733,7 @@ Otherwise, try to mark the following one."
          region extended)
     (cond
 
-     ;; /* original-region is here */ func foo() {
+     ;; /* original-region is here */ fun foo() {
      ;;                               }
      ((progn
         (setq region
@@ -750,7 +750,7 @@ Otherwise, try to mark the following one."
         (and extended (<= (car extended) start-pos end-pos (cdr extended))))
       (list region preferred-direction))
 
-     ;; func foo() {
+     ;; fun foo() {
      ;; } /* original-region is here */
      ((progn
         (setq region
@@ -769,12 +769,12 @@ Otherwise, try to mark the following one."
             (if (eq preferred-direction 'preceding) 'following 'preceding)))
 
      ;; class Foo {
-     ;;   func foo() {
+     ;;   fun foo() {
      ;;   }
      ;;
      ;;   /* original-region is here */
      ;;
-     ;;   func bar() {
+     ;;   fun bar() {
      ;;   }
      ;; }
      (t
@@ -914,7 +914,7 @@ In comments or strings, skip a sentence.  Otherwise, skip a statement."
      ;;   // bbb
      ;;   // ccc
      ;;   // ddd
-     ;;   func foo() { // eee
+     ;;   fun foo() { // eee
      ;;   }
      ;; }
      ;;
@@ -960,7 +960,7 @@ In comments or strings, skip a sentence.  Otherwise, skip a statement."
      ;;   // bbb
      ;;   // ccc
      ;;   // ddd
-     ;;   func foo() { // eee
+     ;;   fun foo() { // eee
      ;;   }
      ;; }
      ;;
@@ -1442,7 +1442,7 @@ of ancestors."
        name-token
        (cond
         ((member keyword-text
-                 '("typealias" "associatedtype" "precedencegroup" "func" "macro"
+                 '("typealias" "associatedtype" "precedencegroup" "fun" "macro"
                    "class" "enum" "struct" "actor" "protocol" "extension"))
          (hylo-mode:forward-token))
 

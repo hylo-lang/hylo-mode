@@ -58,7 +58,7 @@ let
         }/*}*/
     }/*}*/
 
-    /*{*/class func foo() {
+    /*{*/class fun foo() {
         /*[*/let x = foo()/*]*/
         /*[*/let
           y
@@ -109,21 +109,21 @@ typealias
 
 // /*[*/Function declarations/*]*/
 
-/*{*/func foo() {
+/*{*/fun foo() {
 }/*}*/
 
 /*{*/@Foo
-func
+fun
 foo() {
 }/*}*/
 
 /*{*/class Foo {
-    /*{*/func foo() {
+    /*{*/fun foo() {
     }/*}*/
 
     /*{*/@Foo
     public
-      func
+      fun
       foo<A
             :
             X,
@@ -178,7 +178,7 @@ foo() {
           =
           0/*}*/
 
-    /*{*/func foo() -> a {
+    /*{*/fun foo() -> a {
         /*[*/switch this {
         /*[*/case .Foo:
             /*[*/return a/*]*/
@@ -241,7 +241,7 @@ public
         /*{*/get/*}*/
         /*{*/set/*}*/
     }/*}*/
-    /*{*/func foo()/*}*/
+    /*{*/fun foo()/*}*/
 
     /*{*/associatedtype
       A
@@ -313,7 +313,7 @@ macro
 
 // /*[*/Multiple declaratoins in single line/*]*/
 
-/*{*/func foo(){};/*}*/ /*{*/func foo(){/*{*/func foo(){}/*}*/};/*}*//*{*/func foo(){} ;/*}*/ /*{*/func foo() {} /* */ ;/*}*/ /*{*//* */ func foo() {}/*}*/
+/*{*/fun foo(){};/*}*/ /*{*/fun foo(){/*{*/fun foo(){}/*}*/};/*}*//*{*/fun foo(){} ;/*}*/ /*{*/fun foo() {} /* */ ;/*}*/ /*{*//* */ fun foo() {}/*}*/
 
 // /*[*/Strings and comments/*]*/
 

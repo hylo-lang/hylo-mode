@@ -35,7 +35,7 @@ let x = foo.where +
 
 // keywords as parameter names
 
-func foo() {
+fun foo() {
     // Keywords used in declarations
     foo(
       associatedtype: 1
@@ -56,7 +56,7 @@ func foo() {
       fileprivate: 1
     )
     foo(
-      func: 1
+      fun: 1
     )
     foo(
       import: 1

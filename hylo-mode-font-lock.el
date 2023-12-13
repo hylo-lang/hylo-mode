@@ -198,7 +198,7 @@ This function does not search beyond LIMIT."
     (concat
      "\\<\\("
      (string-join
-      '("func" "enum" "struct" "class" "protocol" "extension" "actor" "macro")
+      '("fun" "enum" "struct" "class" "protocol" "extension" "actor" "macro")
       "\\|")
      "\\)\\>"))))
 
@@ -520,7 +520,7 @@ Return nil otherwise."
   "Keywords used as constants.")
 
 (defconst hylo-mode:declaration-keywords
-  '("associatedtype" "class" "deinit" "enum" "extension" "fileprivate" "func"
+  '("associatedtype" "class" "deinit" "enum" "extension" "fileprivate" "fun"
     "import" "init" "inout" "internal" "let" "open" "operator" "package"
     "private" "protocol" "public" "any" "some" "static" "struct" "subscript"
     "typealias" "var" "actor" "nonisolated" "isolated" "distributed"

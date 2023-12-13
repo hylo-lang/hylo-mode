@@ -621,7 +621,7 @@ return non-nil."
      ;;
      ;; Examples:
      ;;
-     ;; func foo() async throws -> Void
+     ;; fun foo() async throws -> Void
      ;; foo { () async throws -> void in }
      ;; let f: () async throws -> Void = g
      ;; get async throws {}
@@ -693,7 +693,7 @@ return non-nil."
 
      ;; Suppress implicit semicolon after declaration starters.
      ((member (hylo-mode:token:text previous-token)
-              '("class" "struct" "actor" "protocol" "enum" "extension" "func"
+              '("class" "struct" "actor" "protocol" "enum" "extension" "fun"
                 "typealias" "associatedtype" "precedencegroup" "operator"
                 "macro"))
       nil)
@@ -765,7 +765,7 @@ return non-nil."
      ;;
      ;; `protocol' is handled by the next rule
      ((member (hylo-mode:token:text next-token)
-              '("class" "struct" "actor" "enum" "extension" "func" "typealias"
+              '("class" "struct" "actor" "enum" "extension" "fun" "typealias"
                 "associatedtype" "precedencegroup" "macro"))
       t)
 
@@ -858,7 +858,7 @@ Return nil otherwise."
          (hylo-mode:function-parameter-clause-p)))
        ((eq previous-type 'identifier)
         (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
-                '("func" "macro")))
+                '("fun" "macro")))
        (t nil)))))
 
 (defun hylo-mode:supertype-colon-p ()
@@ -949,7 +949,7 @@ Return nil otherwise."
     (or (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
                 '("init" "subscript"))
         (member (hylo-mode:token:text (hylo-mode:backward-token-simple))
-                '("typealias" "func" "enum" "struct" "actor" "class" "init"
+                '("typealias" "fun" "enum" "struct" "actor" "class" "init"
                   "macro")))))
 
 (defun hylo-mode:fix-operator-type (token)
@@ -980,14 +980,14 @@ Other properties are the same as the TOKEN."
        (has-following-dot (eq (char-after end) ?.))
        (is-declaration (save-excursion
                          ;; i.e.
-                         ;; func +++(x1: X, x2: X)
+                         ;; fun +++(x1: X, x2: X)
                          ;; or operator declarations.
                          (goto-char start)
                          (member
                           (hylo-mode:token:text
                            (hylo-mode:backquote-identifier-if-after-dot
                             (hylo-mode:backward-token-simple)))
-                          '("func" "operator"))))
+                          '("fun" "operator"))))
        (type
         (cond
          (is-declaration 'identifier)
