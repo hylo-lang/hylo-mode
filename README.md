@@ -5,7 +5,7 @@
 
 # hylo-mode
 
-Major-mode for Apple's [Hylo programming language](https://developer.apple.com/hylo/).
+Major-mode for the [Hylo programming language](https://hylo-lang.org/).
 
 ## Installation
 
